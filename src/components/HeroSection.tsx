@@ -24,12 +24,28 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
           transition={{ duration: 2.2, ease: [0.16, 1, 0.3, 1] }}
           className="w-full h-full"
         >
-          <img
-            src="/editorial/hero.jpg"
-            alt="SAPPHIRE Haute Couture Campaign — Architectural drape in travertine light"
-            referrerPolicy="no-referrer"
-            className="w-full h-full object-cover object-center filter brightness-[0.72] contrast-[1.05]"
-          />
+          <picture className="w-full h-full block">
+            <source
+              type="image/webp"
+              srcSet="/editorial/hero-750.webp 750w, /editorial/hero-1100.webp 1100w, /editorial/hero.webp 1376w"
+              sizes="100vw"
+            />
+            <source
+              type="image/jpeg"
+              srcSet="/editorial/hero-750.jpg 750w, /editorial/hero.jpg 1376w"
+              sizes="100vw"
+            />
+            <img
+              src="/editorial/hero.webp"
+              alt="SAPPHIRE Haute Couture Campaign — Architectural drape in travertine light"
+              width={1376}
+              height={768}
+              fetchPriority="high"
+              loading="eager"
+              decoding="async"
+              className="w-full h-full object-cover object-center filter brightness-[0.72] contrast-[1.05]"
+            />
+          </picture>
         </motion.div>
         {/* Subtle vignette and gradient for extreme typographic legibility */}
         <div className="absolute inset-0 bg-gradient-to-t from-[#0B0A0A]/85 via-black/25 to-black/30 pointer-events-none" />

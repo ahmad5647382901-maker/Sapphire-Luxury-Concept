@@ -93,12 +93,20 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   >
                     {/* Item Image */}
                     <div className="w-20 h-24 bg-[#141312] border border-[#FAF8F5]/10 overflow-hidden shrink-0">
-                      <img
-                        src={item.product.images[0].url}
-                        alt={item.product.name}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center"
-                      />
+                      <picture className="w-full h-full block">
+                        {item.product.images[0].thumbnailWebpUrl && (
+                          <source type="image/webp" srcSet={item.product.images[0].thumbnailWebpUrl} />
+                        )}
+                        <img
+                          src={item.product.images[0].thumbnailUrl || item.product.images[0].url}
+                          alt={item.product.name}
+                          width={80}
+                          height={96}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover object-center"
+                        />
+                      </picture>
                     </div>
 
                     {/* Details */}

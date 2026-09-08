@@ -73,12 +73,20 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
               ) : (
                 <div className="flex gap-4 border-b border-[#FAF8F5]/10 pb-6">
                   <div className="w-20 h-24 bg-[#141312] border border-[#FAF8F5]/10 overflow-hidden shrink-0">
-                    <img
-                      src={product.images[0].url}
-                      alt={product.name}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover object-center"
-                    />
+                    <picture className="w-full h-full block">
+                      {product.images[0].thumbnailWebpUrl && (
+                        <source type="image/webp" srcSet={product.images[0].thumbnailWebpUrl} />
+                      )}
+                      <img
+                        src={product.images[0].thumbnailUrl || product.images[0].url}
+                        alt={product.name}
+                        width={80}
+                        height={96}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover object-center"
+                      />
+                    </picture>
                   </div>
                   <div className="flex-1 flex flex-col justify-between">
                     <div>

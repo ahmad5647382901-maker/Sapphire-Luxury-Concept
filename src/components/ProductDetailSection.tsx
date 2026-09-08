@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   Heart,
@@ -83,6 +83,46 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
 
   const currentImage = product.images[selectedImageIndex];
 
+  // Prefetch secondary full-res perspective on demand (hover or idle) without blocking initial page load
+  const handleThumbnailHover = (idx: number) => {
+    const target = product.images[idx];
+    if (target?.webpUrl && typeof window !== 'undefined') {
+      const img = new Image();
+      img.src = target.webpUrl;
+    }
+  };
+
+  // Idle prefetch: When user reaches this section, gently prefetch the next perspective during browser idle time
+  useEffect(() => {
+    if (typeof window === 'undefined' || !('IntersectionObserver' in window)) return;
+    const el = imageContainerRef.current;
+    if (!el) return;
+
+    let timeoutId: number | null = null;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting) {
+          // Preload secondary perspective when idle
+          timeoutId = window.setTimeout(() => {
+            const nextImg = product.images[1];
+            if (nextImg?.webpUrl) {
+              const pre = new Image();
+              pre.src = nextImg.webpUrl;
+            }
+          }, 1500);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '150px' }
+    );
+
+    observer.observe(el);
+    return () => {
+      observer.disconnect();
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [product.images]);
+
   const toggleAccordion = (id: string) => {
     setOpenAccordion((prev) => (prev === id ? null : id));
   };
@@ -116,6 +156,7 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
               type="button"
               id="inspect-rear-view-btn"
               onClick={() => setSelectedImageIndex(2)}
+              onMouseEnter={() => handleThumbnailHover(2)}
               className={`pb-1 border-b transition-all duration-300 ${
                 selectedImageIndex === 2
                   ? 'border-[#D8CFBE] text-[#FAF8F5]'
@@ -149,20 +190,41 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                   className="w-full h-full relative"
                 >
-                  <img
-                    src={currentImage.url}
-                    alt={currentImage.alt}
-                    referrerPolicy="no-referrer"
-                    style={{
-                      transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-                      transform: isHovered ? 'scale(1.2)' : 'scale(1)',
-                      transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
-                    }}
-                    className="w-full h-full object-cover object-center pointer-events-none filter contrast-[1.02]"
-                  />
+                  <picture className="w-full h-full block">
+                    {currentImage.webpSrcSet ? (
+                      <source
+                        type="image/webp"
+                        srcSet={currentImage.webpSrcSet}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 58vw, 680px"
+                      />
+                    ) : currentImage.webpUrl ? (
+                      <source type="image/webp" srcSet={currentImage.webpUrl} />
+                    ) : null}
+                    {currentImage.jpgSrcSet ? (
+                      <source
+                        type="image/jpeg"
+                        srcSet={currentImage.jpgSrcSet}
+                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 58vw, 680px"
+                      />
+                    ) : null}
+                    <img
+                      src={currentImage.webpUrl || currentImage.url}
+                      alt={currentImage.alt}
+                      width={896}
+                      height={1200}
+                      loading={selectedImageIndex === 0 ? 'lazy' : 'eager'}
+                      decoding="async"
+                      style={{
+                        transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
+                        transform: isHovered ? 'scale(1.2)' : 'scale(1)',
+                        transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
+                      }}
+                      className="w-full h-full object-cover object-center pointer-events-none filter contrast-[1.02]"
+                    />
+                  </picture>
                 </motion.div>
               </AnimatePresence>
 
@@ -184,6 +246,7 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                     e.stopPropagation();
                     setSelectedImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
                   }}
+                  onMouseEnter={() => handleThumbnailHover((selectedImageIndex - 1 + product.images.length) % product.images.length)}
                   aria-label="Previous perspective"
                   className="pointer-events-auto p-2.5 bg-[#0B0A0A]/60 backdrop-blur-xs text-[#FAF8F5] border border-[#FAF8F5]/10 opacity-70 hover:opacity-100 hover:bg-[#0B0A0A] transition-all"
                 >
@@ -195,6 +258,7 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                     e.stopPropagation();
                     setSelectedImageIndex((prev) => (prev + 1) % product.images.length);
                   }}
+                  onMouseEnter={() => handleThumbnailHover((selectedImageIndex + 1) % product.images.length)}
                   aria-label="Next perspective"
                   className="pointer-events-auto p-2.5 bg-[#0B0A0A]/60 backdrop-blur-xs text-[#FAF8F5] border border-[#FAF8F5]/10 opacity-70 hover:opacity-100 hover:bg-[#0B0A0A] transition-all"
                 >
@@ -221,6 +285,8 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                     id={`gallery-perspective-${idx}`}
                     type="button"
                     onClick={() => setSelectedImageIndex(idx)}
+                    onMouseEnter={() => handleThumbnailHover(idx)}
+                    onFocus={() => handleThumbnailHover(idx)}
                     className={`group text-left transition-all duration-300 flex flex-col space-y-2 pb-2 border-b-2 ${
                       isActive
                         ? 'border-[#D8CFBE] opacity-100'
@@ -228,12 +294,23 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                     }`}
                   >
                     <div className="aspect-[4/3] w-full overflow-hidden bg-[#141312] border border-[#FAF8F5]/10">
-                      <img
-                        src={img.url}
-                        alt={img.alt}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
-                      />
+                      <picture className="w-full h-full block">
+                        {img.thumbnailWebpUrl && (
+                          <source
+                            type="image/webp"
+                            srcSet={`${img.thumbnailWebpUrl} 1x, ${img.webpUrl || img.url} 2x`}
+                          />
+                        )}
+                        <img
+                          src={img.thumbnailWebpUrl || img.thumbnailUrl || img.url}
+                          alt={img.alt}
+                          width={200}
+                          height={150}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
+                        />
+                      </picture>
                     </div>
                     <div className="flex items-center justify-between">
                       <span className="text-[9px] sm:text-[10px] font-sans tracking-[0.2em] uppercase text-[#FAF8F5] font-medium">

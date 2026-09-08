@@ -4,6 +4,13 @@ export interface ProductImage {
   viewName: string;
   url: string;
   alt: string;
+  webpUrl?: string;
+  webpSrcSet?: string;
+  jpgSrcSet?: string;
+  thumbnailUrl?: string;
+  thumbnailWebpUrl?: string;
+  width?: number;
+  height?: number;
 }
 
 export interface Product {
@@ -38,8 +45,16 @@ export interface CartItem {
 export interface EditorialStory {
   id: string;
   title: string;
-  subtitle: string;
+  subtitle?: string;
+  edition?: string;
+  category?: string;
   description: string;
   image: string;
-  label: string;
+  webpUrl?: string;
+  webpSrcSet?: string;
+  jpgSrcSet?: string;
+  width?: number;
+  height?: number;
+  label?: string;
+  year?: string;
 }

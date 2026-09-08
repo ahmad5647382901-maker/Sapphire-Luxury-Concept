@@ -54,12 +54,33 @@ export const CollectionEditorial: React.FC<CollectionEditorialProps> = ({ onSele
                   onClick={() => onSelectStory(col.id)}
                 >
                   <div className="aspect-[4/5] sm:aspect-[16/11] w-full overflow-hidden">
-                    <img
-                      src={col.image}
-                      alt={col.title}
-                      referrerPolicy="no-referrer"
-                      className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-103 filter contrast-[1.03] brightness-[0.88]"
-                    />
+                    <picture className="w-full h-full block">
+                      {col.webpSrcSet ? (
+                        <source
+                          type="image/webp"
+                          srcSet={col.webpSrcSet}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 720px"
+                        />
+                      ) : col.webpUrl ? (
+                        <source type="image/webp" srcSet={col.webpUrl} />
+                      ) : null}
+                      {col.jpgSrcSet ? (
+                        <source
+                          type="image/jpeg"
+                          srcSet={col.jpgSrcSet}
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 60vw, 720px"
+                        />
+                      ) : null}
+                      <img
+                        src={col.webpUrl || col.image}
+                        alt={col.title}
+                        width={col.width || 896}
+                        height={col.height || 1200}
+                        loading="lazy"
+                        decoding="async"
+                        className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-103 filter contrast-[1.03] brightness-[0.88]"
+                      />
+                    </picture>
                   </div>
 
                   {/* Micro Metadata Tag */}

@@ -57,12 +57,33 @@ export const CraftsmanshipSection: React.FC = () => {
             className="lg:col-span-6 relative group overflow-hidden bg-[#141312] border border-[#FAF8F5]/10"
           >
             <div className="aspect-[4/5] w-full overflow-hidden">
-              <img
-                src={NOIR_STRUCTURE_BAG.images[3].url}
-                alt="NOIR STRUCTURE BAG — Macro leather craftsmanship detail"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-103 filter contrast-[1.03] brightness-[0.92]"
-              />
+              <picture className="w-full h-full block">
+                {NOIR_STRUCTURE_BAG.images[3].webpSrcSet ? (
+                  <source
+                    type="image/webp"
+                    srcSet={NOIR_STRUCTURE_BAG.images[3].webpSrcSet}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                  />
+                ) : NOIR_STRUCTURE_BAG.images[3].webpUrl ? (
+                  <source type="image/webp" srcSet={NOIR_STRUCTURE_BAG.images[3].webpUrl} />
+                ) : null}
+                {NOIR_STRUCTURE_BAG.images[3].jpgSrcSet ? (
+                  <source
+                    type="image/jpeg"
+                    srcSet={NOIR_STRUCTURE_BAG.images[3].jpgSrcSet}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
+                  />
+                ) : null}
+                <img
+                  src={NOIR_STRUCTURE_BAG.images[3].webpUrl || NOIR_STRUCTURE_BAG.images[3].url}
+                  alt="NOIR STRUCTURE BAG — Macro leather craftsmanship detail"
+                  width={896}
+                  height={1200}
+                  loading="lazy"
+                  decoding="async"
+                  className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-103 filter contrast-[1.03] brightness-[0.92]"
+                />
+              </picture>
             </div>
             <div className="absolute bottom-6 left-6 bg-[#0B0A0A]/85 backdrop-blur-xs border border-[#FAF8F5]/10 text-[#FAF8F5] px-3.5 py-1.5 text-[8px] tracking-[0.3em] uppercase font-sans">
               Macro Study · Calfskin Texture

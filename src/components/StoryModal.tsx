@@ -51,12 +51,32 @@ export const StoryModal: React.FC<StoryModalProps> = ({
               <div className="grid grid-cols-1 md:grid-cols-12 gap-8 md:gap-12 items-center">
                 {/* Image */}
                 <div className="md:col-span-6 bg-[#141312] border border-[#FAF8F5]/10 overflow-hidden aspect-[3/4]">
-                  <img
-                    src={currentStory.image}
-                    alt={currentStory.title}
-                    referrerPolicy="no-referrer"
-                    className="w-full h-full object-cover object-center filter contrast-[1.02] brightness-[0.9]"
-                  />
+                  <picture className="w-full h-full block">
+                    {currentStory.webpSrcSet ? (
+                      <source
+                        type="image/webp"
+                        srcSet={currentStory.webpSrcSet}
+                        sizes="(max-width: 768px) 100vw, 450px"
+                      />
+                    ) : currentStory.webpUrl ? (
+                      <source type="image/webp" srcSet={currentStory.webpUrl} />
+                    ) : null}
+                    {currentStory.jpgSrcSet ? (
+                      <source
+                        type="image/jpeg"
+                        srcSet={currentStory.jpgSrcSet}
+                        sizes="(max-width: 768px) 100vw, 450px"
+                      />
+                    ) : null}
+                    <img
+                      src={currentStory.webpUrl || currentStory.image}
+                      alt={currentStory.title}
+                      width={currentStory.width || 896}
+                      height={currentStory.height || 1200}
+                      decoding="async"
+                      className="w-full h-full object-cover object-center filter contrast-[1.02] brightness-[0.9]"
+                    />
+                  </picture>
                 </div>
 
                 {/* Content */}

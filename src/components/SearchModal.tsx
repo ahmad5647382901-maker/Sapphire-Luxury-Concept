@@ -101,12 +101,20 @@ export const SearchModal: React.FC<SearchModalProps> = ({
                 >
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-14 bg-[#141312] border border-[#FAF8F5]/10 overflow-hidden">
-                      <img
-                        src={NOIR_STRUCTURE_BAG.images[0].url}
-                        alt={NOIR_STRUCTURE_BAG.name}
-                        referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover"
-                      />
+                      <picture className="w-full h-full block">
+                        {NOIR_STRUCTURE_BAG.images[0].thumbnailWebpUrl && (
+                          <source type="image/webp" srcSet={NOIR_STRUCTURE_BAG.images[0].thumbnailWebpUrl} />
+                        )}
+                        <img
+                          src={NOIR_STRUCTURE_BAG.images[0].thumbnailUrl || NOIR_STRUCTURE_BAG.images[0].url}
+                          alt={NOIR_STRUCTURE_BAG.name}
+                          width={48}
+                          height={56}
+                          loading="lazy"
+                          decoding="async"
+                          className="w-full h-full object-cover"
+                        />
+                      </picture>
                     </div>
                     <div>
                       <h4 className="font-serif text-base text-[#FAF8F5]">
