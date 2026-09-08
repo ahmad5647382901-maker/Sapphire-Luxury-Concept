@@ -1,0 +1,6 @@
+{
+  "name": "SAPPHIRE Editorial Concept",
+  "description": "An independent luxury fashion e-commerce concept for SAPPHIRE, featuring cinematic editorial storytelling, structured leather silhouettes, and modern Pakistani couture.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
