@@ -27,8 +27,9 @@ export const CraftsmanshipSection: React.FC = () => {
   return (
     <section
       id="section-craftsmanship"
-      className="relative py-28 md:py-44 px-6 sm:px-10 md:px-14 bg-[#0B0A0A] border-t border-[#FAF8F5]/10 overflow-hidden text-[#FAF8F5]"
+      className="relative py-28 md:py-44 px-6 sm:px-10 md:px-14 bg-[#0B0A0A] border-t border-[#FAF8F5]/10 overflow-hidden text-[#FAF8F5] scroll-mt-20"
     >
+      <div id="section-craft" className="absolute top-0 left-0 scroll-mt-20 pointer-events-none" />
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 md:mb-32 pb-6 border-b border-[#FAF8F5]/10 gap-8">

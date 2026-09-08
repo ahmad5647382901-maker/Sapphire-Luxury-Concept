@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Heart, ArrowRight, Trash2 } from 'lucide-react';
 import { Product } from '../types';
@@ -20,6 +20,23 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
   onToggleWishlist,
   onAddToCart,
 }) => {
+  // Lock body scroll and listen for Escape key
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -31,7 +48,7 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/75 backdrop-blur-xs"
+            className="absolute inset-0 bg-black/75 backdrop-blur-xs cursor-pointer"
           />
 
           {/* Drawer */}
@@ -50,10 +67,11 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                 </h2>
               </div>
               <button
+                id="close-wishlist-button"
                 type="button"
                 onClick={onClose}
                 aria-label="Close wishlist"
-                className="p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors"
+                className="p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -95,9 +113,11 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                           {product.name}
                         </h4>
                         <button
+                          id="remove-from-wishlist-button"
                           type="button"
                           onClick={onToggleWishlist}
-                          className="text-[#FAF8F5]/40 hover:text-[#FAF8F5] p-1 transition-colors"
+                          aria-label="Remove item from wishlist"
+                          className="text-[#FAF8F5]/40 hover:text-[#FAF8F5] p-1 transition-colors cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -108,12 +128,13 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                     </div>
 
                     <button
+                      id="move-to-bag-from-wishlist-button"
                       type="button"
                       onClick={() => {
                         onAddToCart();
                         onClose();
                       }}
-                      className="mt-3 py-2.5 px-3 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.22em] uppercase font-sans font-medium flex items-center justify-center gap-2 hover:bg-[#D8CFBE] transition-colors"
+                      className="mt-3 py-2.5 px-3 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.22em] uppercase font-sans font-medium flex items-center justify-center gap-2 hover:bg-[#D8CFBE] transition-colors cursor-pointer"
                     >
                       <span>Move to Bag</span>
                       <ArrowRight className="w-3 h-3" />
@@ -134,3 +155,4 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
     </AnimatePresence>
   );
 };
+

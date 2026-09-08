@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, ShieldCheck, Truck, Check, ArrowRight } from 'lucide-react';
 import { CartItem } from '../types';
@@ -24,6 +24,23 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [orderRef, setOrderRef] = useState('');
+
+  // Lock body scroll and listen for Escape key
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
 
   const subtotal = items.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
@@ -59,7 +76,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-black/80 backdrop-blur-xs"
+            className="fixed inset-0 bg-black/80 backdrop-blur-xs cursor-pointer"
           />
 
           {/* Modal Content */}
@@ -73,10 +90,11 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             >
               {/* Close Button */}
               <button
+                id="close-checkout-modal"
                 type="button"
                 onClick={onClose}
                 aria-label="Close checkout"
-                className="absolute top-6 right-6 p-1.5 text-[#FAF8F5]/60 hover:text-[#FAF8F5] transition-colors"
+                className="absolute top-6 right-6 p-1.5 text-[#FAF8F5]/60 hover:text-[#FAF8F5] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -105,9 +123,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
                   <div className="pt-3">
                     <button
+                      id="return-to-lookbook-btn"
                       type="button"
                       onClick={handleFinish}
-                      className="px-8 py-3 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium hover:bg-[#D8CFBE] transition-colors"
+                      className="px-8 py-3 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium hover:bg-[#D8CFBE] transition-colors cursor-pointer"
                     >
                       Return to Lookbook
                     </button>
@@ -146,6 +165,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           Full Name
                         </label>
                         <input
+                          id="checkout-full-name"
                           type="text"
                           required
                           value={fullName}
@@ -160,6 +180,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           Contact Phone
                         </label>
                         <input
+                          id="checkout-phone"
                           type="tel"
                           required
                           value={phone}
@@ -174,6 +195,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           City
                         </label>
                         <select
+                          id="checkout-city"
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
                           className="w-full p-2.5 bg-[#141312] border border-[#FAF8F5]/20 focus:border-[#FAF8F5] outline-none text-[#FAF8F5]"
@@ -193,9 +215,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                         </label>
                         <div className="grid grid-cols-2 gap-2 h-[41px]">
                           <button
+                            id="payment-mode-card"
                             type="button"
                             onClick={() => setPaymentMethod('card')}
-                            className={`px-2 text-[9px] tracking-wider uppercase border transition-colors ${
+                            className={`px-2 text-[9px] tracking-wider uppercase border transition-colors cursor-pointer ${
                               paymentMethod === 'card'
                                 ? 'bg-[#FAF8F5] text-[#0B0A0A] border-[#FAF8F5]'
                                 : 'border-[#FAF8F5]/20 text-[#FAF8F5]/70 hover:text-[#FAF8F5]'
@@ -204,9 +227,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                             Card / Online
                           </button>
                           <button
+                            id="payment-mode-cod"
                             type="button"
                             onClick={() => setPaymentMethod('cod')}
-                            className={`px-2 text-[9px] tracking-wider uppercase border transition-colors ${
+                            className={`px-2 text-[9px] tracking-wider uppercase border transition-colors cursor-pointer ${
                               paymentMethod === 'cod'
                                 ? 'bg-[#FAF8F5] text-[#0B0A0A] border-[#FAF8F5]'
                                 : 'border-[#FAF8F5]/20 text-[#FAF8F5]/70 hover:text-[#FAF8F5]'
@@ -222,6 +246,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           Delivery Address
                         </label>
                         <input
+                          id="checkout-address"
                           type="text"
                           required
                           value={address}
@@ -237,7 +262,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       id="submit-order-btn"
                       type="submit"
                       disabled={isProcessing}
-                      className="w-full py-3.5 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium transition-colors hover:bg-[#D8CFBE] flex items-center justify-center gap-3"
+                      className="w-full py-3.5 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium transition-colors hover:bg-[#D8CFBE] flex items-center justify-center gap-3 cursor-pointer disabled:opacity-50"
                     >
                       {isProcessing ? (
                         <div className="flex items-center gap-2">
@@ -272,3 +297,4 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
     </AnimatePresence>
   );
 };
+

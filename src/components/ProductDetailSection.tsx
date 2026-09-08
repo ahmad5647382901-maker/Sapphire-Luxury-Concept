@@ -135,11 +135,35 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
     { name: 'Atelier Detail', short: 'Craft Detail', subtitle: 'Full-Grain Calfskin & Satin Brass' },
   ];
 
+  // Keyboard navigation for gallery
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only handle if this element or its children have focus or image container is active
+      const container = imageContainerRef.current;
+      if (!container) return;
+      if (document.activeElement && container.contains(document.activeElement)) {
+        if (e.key === 'ArrowLeft') {
+          e.preventDefault();
+          setSelectedImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
+        } else if (e.key === 'ArrowRight') {
+          e.preventDefault();
+          setSelectedImageIndex((prev) => (prev + 1) % product.images.length);
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [product.images.length]);
+
   return (
     <section
       id="section-product-detail"
-      className="relative py-28 md:py-40 px-6 sm:px-10 md:px-14 bg-[#0E0D0D] border-t border-[#FAF8F5]/10 text-[#FAF8F5]"
+      className="relative py-28 md:py-40 px-6 sm:px-10 md:px-14 bg-[#0E0D0D] border-t border-[#FAF8F5]/10 text-[#FAF8F5] scroll-mt-20"
     >
+      {/* Navigation Target Anchors */}
+      <div id="section-hero-object" className="absolute top-0 left-0 scroll-mt-20 pointer-events-none" />
+      <div id="section-product-story" className="absolute top-0 left-0 scroll-mt-20 pointer-events-none" />
+
       <div className="max-w-7xl mx-auto">
         {/* Editorial Subheader */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#FAF8F5]/10 mb-14 md:mb-20 gap-4 text-[10px] tracking-[0.3em] uppercase font-sans text-[#D8CFBE]/60">
@@ -157,6 +181,7 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
               id="inspect-rear-view-btn"
               onClick={() => setSelectedImageIndex(2)}
               onMouseEnter={() => handleThumbnailHover(2)}
+              aria-label="Directly switch to rear elevation view"
               className={`pb-1 border-b transition-all duration-300 ${
                 selectedImageIndex === 2
                   ? 'border-[#D8CFBE] text-[#FAF8F5]'
@@ -176,13 +201,15 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
             <div
               ref={imageContainerRef}
               id="main-product-image-container"
+              tabIndex={0}
+              aria-label="Product image gallery stage. Use left and right arrow keys to switch perspectives."
               onMouseEnter={() => setIsHovered(true)}
               onMouseLeave={() => setIsHovered(false)}
               onMouseMove={handleMouseMove}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="relative aspect-[4/5] sm:aspect-[1/1] w-full overflow-hidden bg-[#141312] border border-[#FAF8F5]/10 select-none cursor-crosshair group"
+              className="relative aspect-[4/5] sm:aspect-[1/1] w-full overflow-hidden bg-[#141312] border border-[#FAF8F5]/10 select-none cursor-crosshair group touch-pan-y focus:outline-hidden focus:border-[#D8CFBE]/60"
             >
               <AnimatePresence mode="wait">
                 <motion.div
@@ -287,7 +314,9 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                     onClick={() => setSelectedImageIndex(idx)}
                     onMouseEnter={() => handleThumbnailHover(idx)}
                     onFocus={() => handleThumbnailHover(idx)}
-                    className={`group text-left transition-all duration-300 flex flex-col space-y-2 pb-2 border-b-2 ${
+                    aria-label={`Switch to ${perspective.name}: ${perspective.subtitle}`}
+                    aria-pressed={isActive}
+                    className={`group text-left transition-all duration-300 flex flex-col space-y-2 pb-2 border-b-2 cursor-pointer ${
                       isActive
                         ? 'border-[#D8CFBE] opacity-100'
                         : 'border-transparent opacity-40 hover:opacity-80'
@@ -324,7 +353,7 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
           </div>
 
           {/* RIGHT: Product Information & Restrained Purchase Panel */}
-          <div className="lg:col-span-5 flex flex-col space-y-8">
+          <div id="section-acquire" className="scroll-mt-24 lg:col-span-5 flex flex-col space-y-8">
             {/* Header Titles */}
             <div className="space-y-3">
               <span className="text-[9px] tracking-[0.35em] uppercase font-sans text-[#D8CFBE] block">

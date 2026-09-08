@@ -14,8 +14,12 @@ export const HeroSection: React.FC<HeroSectionProps> = ({
   return (
     <section
       id="section-hero"
-      className="relative h-screen min-h-[720px] w-full flex flex-col justify-between overflow-hidden bg-[#0B0A0A] text-[#FAF8F5]"
+      className="relative h-screen min-h-[720px] w-full flex flex-col justify-between overflow-hidden bg-[#0B0A0A] text-[#FAF8F5] scroll-mt-20"
     >
+      {/* Target anchors for Curated Navigation */}
+      <div id="section-edition" className="absolute top-0 left-0 scroll-mt-20 pointer-events-none" />
+      <div id="section-new-edition" className="absolute top-0 left-0 scroll-mt-20 pointer-events-none" />
+
       {/* Cinematic Background Image dominating the entire screen */}
       <div className="absolute inset-0 z-0 overflow-hidden">
         <motion.div

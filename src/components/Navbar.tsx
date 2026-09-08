@@ -31,12 +31,28 @@ export const Navbar: React.FC<NavbarProps> = ({
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Lock body scroll and handle Escape key when mobile menu is open
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    document.body.style.overflow = 'hidden';
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMobileMenuOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.style.overflow = '';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [mobileMenuOpen]);
+
   const navLinks = [
-    { name: 'Edition', target: 'section-new-edition' },
+    { name: 'Edition', target: 'section-edition' },
     { name: 'Anthology', target: 'section-collections' },
-    { name: 'Hero Object', target: 'section-product-story' },
+    { name: 'Hero Object', target: 'section-hero-object' },
     { name: 'Craft', target: 'section-craftsmanship' },
-    { name: 'Acquire', target: 'section-product-detail' },
+    { name: 'Acquire', target: 'section-acquire' },
   ];
 
   return (
@@ -108,15 +124,20 @@ export const Navbar: React.FC<NavbarProps> = ({
               id="wishlist-button-trigger"
               type="button"
               onClick={onOpenWishlist}
-              aria-label="View wishlist"
-              className="relative p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors"
+              aria-label={`View wishlist (${wishlistCount})`}
+              className="group flex items-center gap-2 p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors cursor-pointer"
             >
-              <Heart className="w-[17px] h-[17px] stroke-[1.5]" />
-              {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#D8CFBE] text-[#0B0A0A] text-[8px] font-sans font-medium flex items-center justify-center">
-                  {wishlistCount}
-                </span>
-              )}
+              <div className="relative">
+                <Heart className={`w-[17px] h-[17px] stroke-[1.5] ${wishlistCount > 0 ? 'fill-[#D8CFBE] text-[#D8CFBE]' : ''}`} />
+                {wishlistCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#D8CFBE] text-[#0B0A0A] text-[8px] font-sans font-medium flex items-center justify-center">
+                    {wishlistCount}
+                  </span>
+                )}
+              </div>
+              <span className="hidden sm:inline text-[10px] tracking-[0.2em] uppercase font-sans font-medium text-[#FAF8F5]/70 group-hover:text-[#FAF8F5]">
+                Wishlist ({wishlistCount})
+              </span>
             </button>
 
             <button

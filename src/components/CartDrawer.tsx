@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Plus, Minus, Trash2, ArrowRight, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { CartItem } from '../types';
@@ -20,6 +20,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
   onRemoveItem,
   onGoToCheckout,
 }) => {
+  // Lock body scroll and listen for Escape key
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === 'Escape') {
+          onClose();
+        }
+      };
+      window.addEventListener('keydown', handleKeyDown);
+      return () => {
+        document.body.style.overflow = '';
+        window.removeEventListener('keydown', handleKeyDown);
+      };
+    }
+  }, [isOpen, onClose]);
+
   const subtotal = items.reduce(
     (sum, item) => sum + item.product.price * item.quantity,
     0
@@ -36,7 +53,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
             exit={{ opacity: 0 }}
             transition={{ duration: 0.35 }}
             onClick={onClose}
-            className="absolute inset-0 bg-black/75 backdrop-blur-xs"
+            className="absolute inset-0 bg-black/75 backdrop-blur-xs cursor-pointer"
           />
 
           {/* Drawer Panel */}
@@ -60,7 +77,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                 type="button"
                 onClick={onClose}
                 aria-label="Close bag"
-                className="p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors"
+                className="p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -80,7 +97,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   <button
                     type="button"
                     onClick={onClose}
-                    className="mt-2 text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5] border-b border-[#FAF8F5]/40 pb-0.5 hover:border-[#FAF8F5]"
+                    className="mt-2 text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5] border-b border-[#FAF8F5]/40 pb-0.5 hover:border-[#FAF8F5] cursor-pointer"
                   >
                     Return to Collection
                   </button>
@@ -123,8 +140,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                         <button
                           type="button"
                           onClick={() => onRemoveItem(item.product.id)}
-                          aria-label="Remove item"
-                          className="text-[#FAF8F5]/40 hover:text-[#FAF8F5] transition-colors p-1"
+                          aria-label={`Remove ${item.product.name} from bag`}
+                          className="text-[#FAF8F5]/40 hover:text-[#FAF8F5] transition-colors p-1 cursor-pointer"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -136,7 +153,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <button
                             type="button"
                             onClick={() => onUpdateQuantity(item.product.id, item.quantity - 1)}
-                            className="px-2 py-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/5"
+                            aria-label="Decrease quantity"
+                            className="px-2 py-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/5 cursor-pointer"
                           >
                             <Minus className="w-2.5 h-2.5" />
                           </button>
@@ -146,7 +164,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                           <button
                             type="button"
                             onClick={() => onUpdateQuantity(item.product.id, item.quantity + 1)}
-                            className="px-2 py-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/5"
+                            aria-label="Increase quantity"
+                            className="px-2 py-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/5 cursor-pointer"
                           >
                             <Plus className="w-2.5 h-2.5" />
                           </button>
@@ -185,7 +204,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
                   id="checkout-cta-button"
                   type="button"
                   onClick={onGoToCheckout}
-                  className="w-full py-3.5 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium transition-colors hover:bg-[#D8CFBE] flex items-center justify-center gap-3"
+                  className="w-full py-3.5 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium transition-colors hover:bg-[#D8CFBE] flex items-center justify-center gap-3 cursor-pointer"
                 >
                   <span>Proceed to Checkout</span>
                   <ArrowRight className="w-3.5 h-3.5" />
