@@ -20,46 +20,52 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateSection }) => {
   };
 
   return (
-    <footer id="editorial-footer" className="bg-[#0E0D0D] text-[#FAF9F5] pt-20 md:pt-28 pb-12 px-6 sm:px-8 md:px-12 border-t border-[#FAF9F5]/10">
+    <footer
+      id="editorial-footer"
+      className="bg-[#0B0A0A] text-[#FAF8F5] pt-24 md:pt-36 pb-14 px-6 sm:px-10 md:px-14 border-t border-[#FAF8F5]/10"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Upper Editorial Banner */}
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between pb-16 md:pb-20 border-b border-[#FAF9F5]/15 gap-10">
-          <div className="space-y-4 max-w-xl">
-            <span className="text-[10px] tracking-[0.35em] uppercase font-sans text-[#FAF9F5]/40 block">
-              The Digital Edition
+        <div className="flex flex-col lg:flex-row lg:items-end justify-between pb-16 md:pb-24 border-b border-[#FAF8F5]/10 gap-10">
+          <div className="space-y-4 max-w-lg">
+            <span className="text-[9px] tracking-[0.35em] uppercase font-sans text-[#D8CFBE]/60 block">
+              Digital Atelier Concept · 2026
             </span>
-            <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl tracking-wide font-normal">
+            <h2 className="font-serif text-4xl sm:text-5xl md:text-6xl tracking-[0.15em] font-light text-[#FAF8F5]">
               SAPPHIRE
             </h2>
-            <p className="text-xs sm:text-sm font-sans font-light text-[#FAF9F5]/60 leading-relaxed max-w-md">
-              A contemporary digital fashion study re-imagining modern Pakistani luxury, architectural
-              silhouettes, and heirloom leathercraft.
+            <p className="text-xs sm:text-sm font-sans font-light text-[#FAF8F5]/60 leading-relaxed max-w-md">
+              An independent architectural digital study exploring quiet luxury, structured forms, and
+              ancestral Pakistani leathercraft.
             </p>
           </div>
 
-          {/* Newsletter Signup in Footer */}
-          <div className="w-full lg:max-w-md space-y-3">
-            <span className="text-[10px] tracking-[0.25em] uppercase font-sans text-[#FAF9F5]/60 block">
-              Curator's Journal & Private Previews
+          {/* Salon Newsletter */}
+          <div className="w-full lg:max-w-sm space-y-3">
+            <span className="text-[9px] tracking-[0.3em] uppercase font-sans text-[#D8CFBE]/60 block">
+              Private Salon Dispatches
             </span>
             {subscribed ? (
-              <div className="flex items-center gap-2 text-xs font-sans text-[#FAF9F5] py-2">
-                <Check className="w-4 h-4 text-[#FAF9F5]" />
-                <span>Thank you. You have been added to the private list.</span>
+              <div className="flex items-center gap-2 text-xs font-sans text-[#FAF8F5] py-2">
+                <Check className="w-3.5 h-3.5 text-[#D8CFBE]" />
+                <span>You have been registered for private archive access.</span>
               </div>
             ) : (
-              <form onSubmit={handleSubscribe} className="flex border-b border-[#FAF9F5]/30 focus-within:border-[#FAF9F5] transition-colors pb-1">
+              <form
+                onSubmit={handleSubscribe}
+                className="flex border-b border-[#FAF8F5]/30 focus-within:border-[#FAF8F5] transition-colors pb-1"
+              >
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Enter your email"
-                  className="w-full bg-transparent text-xs font-sans placeholder:text-[#FAF9F5]/30 text-[#FAF9F5] focus:outline-none py-2"
+                  className="w-full bg-transparent text-xs font-sans placeholder:text-[#FAF8F5]/40 text-[#FAF8F5] focus:outline-none py-2"
                 />
                 <button
                   type="submit"
-                  className="text-[11px] tracking-[0.2em] uppercase font-sans font-medium text-[#FAF9F5] pl-4 hover:opacity-75 transition-opacity"
+                  className="text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5] pl-4 hover:text-[#D8CFBE] transition-colors"
                 >
                   Join
                 </button>
@@ -68,121 +74,121 @@ export const Footer: React.FC<FooterProps> = ({ onNavigateSection }) => {
           </div>
         </div>
 
-        {/* Links Grid */}
+        {/* Editorial Link Directory */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-10 py-16 text-xs font-sans">
-          {/* Column 1: Navigation */}
+          {/* Column 1: Chapters */}
           <div className="space-y-4">
-            <h3 className="text-[10px] tracking-[0.28em] uppercase font-semibold text-[#FAF9F5]/40">
+            <h3 className="text-[9px] tracking-[0.35em] uppercase font-medium text-[#D8CFBE]/60">
               Anthology
             </h3>
-            <ul className="space-y-2.5 text-[#FAF9F5]/70">
+            <ul className="space-y-2.5 text-[#FAF8F5]/70">
               <li>
                 <button
                   type="button"
-                  onClick={() => onNavigateSection('section-new-edition')}
-                  className="hover:text-[#FAF9F5] transition-colors"
+                  onClick={() => onNavigateSection('section-hero')}
+                  className="hover:text-[#FAF8F5] transition-colors"
                 >
-                  The New Edition
+                  01 · Campaign Overview
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={() => onNavigateSection('section-collections')}
-                  className="hover:text-[#FAF9F5] transition-colors"
+                  className="hover:text-[#FAF8F5] transition-colors"
                 >
-                  Curated Series
+                  02 · Curated Lookbook
                 </button>
               </li>
               <li>
                 <button
                   type="button"
-                  onClick={() => onNavigateSection('section-product-story')}
-                  className="hover:text-[#FAF9F5] transition-colors"
+                  onClick={() => onNavigateSection('section-product-detail')}
+                  className="hover:text-[#FAF8F5] transition-colors"
                 >
-                  Noir Structure Bag
+                  03 · Noir Structure Bag
                 </button>
               </li>
               <li>
                 <button
                   type="button"
                   onClick={() => onNavigateSection('section-craftsmanship')}
-                  className="hover:text-[#FAF9F5] transition-colors"
+                  className="hover:text-[#FAF8F5] transition-colors"
                 >
-                  Atelier Craftsmanship
+                  04 · Atelier Craft
                 </button>
               </li>
             </ul>
           </div>
 
-          {/* Column 2: Customer Care */}
+          {/* Column 2: Client Care */}
           <div className="space-y-4">
-            <h3 className="text-[10px] tracking-[0.28em] uppercase font-semibold text-[#FAF9F5]/40">
+            <h3 className="text-[9px] tracking-[0.35em] uppercase font-medium text-[#D8CFBE]/60">
               Client Care
             </h3>
-            <ul className="space-y-2.5 text-[#FAF9F5]/70">
-              <li className="hover:text-[#FAF9F5] cursor-pointer">White Glove Courier</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Archive Restoration</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Leather Care Guide</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Certificate of Authenticity</li>
+            <ul className="space-y-2.5 text-[#FAF8F5]/70">
+              <li className="hover:text-[#FAF8F5] cursor-pointer">White Glove Courier</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Archive Restoration</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Calfskin Maintenance</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Serialized Certificate</li>
             </ul>
           </div>
 
-          {/* Column 3: Shipping & Returns */}
+          {/* Column 3: Logistics */}
           <div className="space-y-4">
-            <h3 className="text-[10px] tracking-[0.28em] uppercase font-semibold text-[#FAF9F5]/40">
+            <h3 className="text-[9px] tracking-[0.35em] uppercase font-medium text-[#D8CFBE]/60">
               Concierge
             </h3>
-            <ul className="space-y-2.5 text-[#FAF9F5]/70">
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Shipping within Pakistan (2-4 Days)</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">14-Day Complimentary Exchange</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Custom Monogramming</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Private Fitting Appointment</li>
+            <ul className="space-y-2.5 text-[#FAF8F5]/70">
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Pakistan Courier (2–4 Days)</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Complimentary Exchange</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Bespoke Monogramming</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Private Salon Appointments</li>
             </ul>
           </div>
 
-          {/* Column 4: Contact & Social */}
+          {/* Column 4: Presence */}
           <div className="space-y-4">
-            <h3 className="text-[10px] tracking-[0.28em] uppercase font-semibold text-[#FAF9F5]/40">
-              Presence
+            <h3 className="text-[9px] tracking-[0.35em] uppercase font-medium text-[#D8CFBE]/60">
+              Atelier Presence
             </h3>
-            <ul className="space-y-2.5 text-[#FAF9F5]/70">
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Gulberg Atelier, Lahore</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Clifton Sanctuary, Karachi</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Instagram @sapphire.concept</li>
-              <li className="hover:text-[#FAF9F5] cursor-pointer">Vogue International Features</li>
+            <ul className="space-y-2.5 text-[#FAF8F5]/70">
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Gulberg Atelier, Lahore</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Clifton Sanctuary, Karachi</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Archive Vault, Islamabad</li>
+              <li className="hover:text-[#FAF8F5] cursor-pointer">Vogue International Archive</li>
             </ul>
           </div>
         </div>
 
-        {/* Unofficial Disclaimer & Copyright */}
-        <div className="border-t border-[#FAF9F5]/10 pt-8 flex flex-col md:flex-row items-center justify-between text-[11px] font-sans text-[#FAF9F5]/50 gap-4">
+        {/* Disclaimer & Colophon */}
+        <div className="border-t border-[#FAF8F5]/10 pt-8 flex flex-col md:flex-row items-center justify-between text-[10px] font-sans text-[#FAF8F5]/60 gap-4">
           <div className="text-center md:text-left space-y-1">
-            <p className="tracking-wider">
-              Independent Unofficial Digital Concept Exploration.
+            <p className="tracking-wider text-[#FAF8F5]/80">
+              Independent Unofficial Luxury Fashion Concept.
             </p>
-            <p className="text-[#FAF9F5]/40 text-[10px]">
+            <p className="text-[9px] text-[#FAF8F5]/40">
               This project is an independent artistic fashion editorial and design concept for SAPPHIRE. It is not affiliated with or endorsed by the official brand.
             </p>
           </div>
 
           <div className="flex items-center gap-6">
             <a
-              href="/sapphire-concept-source.zip"
-              download="sapphire-concept-source.zip"
-              className="text-[10px] tracking-[0.2em] uppercase text-[#FAF9F5]/70 hover:text-[#FAF9F5] underline underline-offset-4 transition-colors"
+              href="/sapphire-luxury-concept.zip"
+              download="sapphire-luxury-concept.zip"
+              className="text-[9px] tracking-[0.2em] uppercase text-[#D8CFBE] hover:text-[#FAF8F5] underline underline-offset-4 transition-colors"
             >
-              Download Project ZIP
+              Export Project ZIP
             </a>
             <span>© 2026 SAPPHIRE CONCEPT</span>
             <button
               type="button"
               onClick={scrollToTop}
               aria-label="Scroll to top"
-              className="flex items-center gap-2 text-[10px] tracking-[0.2em] uppercase text-[#FAF9F5]/70 hover:text-[#FAF9F5] transition-colors"
+              className="flex items-center gap-1.5 text-[9px] tracking-[0.2em] uppercase text-[#FAF8F5]/80 hover:text-[#FAF8F5] transition-colors"
             >
               <span>Top</span>
-              <ArrowUp className="w-3.5 h-3.5" />
+              <ArrowUp className="w-3 h-3" />
             </button>
           </div>
         </div>

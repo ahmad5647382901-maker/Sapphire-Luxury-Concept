@@ -6,13 +6,12 @@ import {
   Minus,
   Check,
   ChevronDown,
-  Shield,
-  Truck,
-  RotateCcw,
-  Sparkles,
   Maximize2,
   ChevronLeft,
   ChevronRight,
+  ShieldCheck,
+  Truck,
+  RotateCcw,
 } from 'lucide-react';
 import { Product } from '../types';
 
@@ -40,7 +39,7 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
   const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
   const imageContainerRef = useRef<HTMLDivElement>(null);
 
-  // Mobile touch swipe handling
+  // Mobile touch swipe
   const touchStartXRef = useRef<number | null>(null);
   const touchEndXRef = useRef<number | null>(null);
 
@@ -55,15 +54,11 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
   const handleTouchEnd = () => {
     if (!touchStartXRef.current || !touchEndXRef.current) return;
     const distance = touchStartXRef.current - touchEndXRef.current;
-    const isLeftSwipe = distance > 45;
-    const isRightSwipe = distance < -45;
-
-    if (isLeftSwipe) {
+    if (distance > 40) {
       setSelectedImageIndex((prev) => (prev + 1) % product.images.length);
-    } else if (isRightSwipe) {
+    } else if (distance < -40) {
       setSelectedImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
     }
-
     touchStartXRef.current = null;
     touchEndXRef.current = null;
   };
@@ -82,8 +77,8 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
       onAddToCart(quantity);
       setIsAdding(false);
       setAddedSuccess(true);
-      setTimeout(() => setAddedSuccess(false), 2600);
-    }, 450);
+      setTimeout(() => setAddedSuccess(false), 2400);
+    }, 350);
   };
 
   const currentImage = product.images[selectedImageIndex];
@@ -92,37 +87,51 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
     setOpenAccordion((prev) => (prev === id ? null : id));
   };
 
+  // Descriptive editorial perspective titles (strictly no cheap marketplace 1/2/3/4 numbers)
+  const perspectiveTitles = [
+    { name: 'Front Elevation', short: 'Front', subtitle: 'Architectural Silhouette' },
+    { name: 'Side Profile', short: 'Side', subtitle: 'Tapered Geometric Gusset' },
+    { name: 'Rear Elevation', short: 'Back View', subtitle: 'Flush Slip Pocket & Saddle Stitching' },
+    { name: 'Atelier Detail', short: 'Craft Detail', subtitle: 'Full-Grain Calfskin & Satin Brass' },
+  ];
+
   return (
     <section
       id="section-product-detail"
-      className="relative py-24 md:py-36 px-6 sm:px-8 md:px-12 bg-[#FAF9F5] border-t border-[#0E0D0D]/10"
+      className="relative py-28 md:py-40 px-6 sm:px-10 md:px-14 bg-[#0E0D0D] border-t border-[#FAF8F5]/10 text-[#FAF8F5]"
     >
       <div className="max-w-7xl mx-auto">
         {/* Editorial Subheader */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#0E0D0D]/10 mb-12 md:mb-16 gap-4">
-          <div className="flex items-center gap-3 text-xs tracking-[0.25em] uppercase font-sans text-[#0E0D0D]/50 font-medium">
-            <span>Product Page</span>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-6 border-b border-[#FAF8F5]/10 mb-14 md:mb-20 gap-4 text-[10px] tracking-[0.3em] uppercase font-sans text-[#D8CFBE]/60">
+          <div className="flex items-center gap-3">
+            <span>Chapter 03</span>
             <span>·</span>
-            <span>Archive No. SAP-2026-N01</span>
+            <span className="text-[#FAF8F5]">The Masterwork Object</span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs tracking-[0.18em] uppercase font-sans text-[#0E0D0D]/60">
-            <span className="hidden sm:inline">Complimentary Pakistan Delivery</span>
+          <div className="flex items-center gap-6">
+            <span className="hidden sm:inline text-[#FAF8F5]/40">Complimentary Insured Courier</span>
+            {/* Direct Rear Elevation Quick Switcher */}
             <button
               type="button"
+              id="inspect-rear-view-btn"
               onClick={() => setSelectedImageIndex(2)}
-              className="text-[#0E0D0D] underline underline-offset-4 hover:opacity-75 transition-opacity"
+              className={`pb-1 border-b transition-all duration-300 ${
+                selectedImageIndex === 2
+                  ? 'border-[#D8CFBE] text-[#FAF8F5]'
+                  : 'border-[#FAF8F5]/30 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:border-[#FAF8F5]'
+              }`}
             >
-              Direct Rear Elevation
+              Direct Rear Elevation →
             </button>
           </div>
         </div>
 
         {/* Product Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
-          {/* LEFT: Product Image Gallery */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
+          {/* LEFT: Large Visually Dominant Product Gallery */}
           <div className="lg:col-span-7 flex flex-col space-y-6">
-            {/* Cinematic Main Image Stage */}
+            {/* Main Image Stage */}
             <div
               ref={imageContainerRef}
               id="main-product-image-container"
@@ -132,15 +141,15 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
-              className="relative aspect-[4/5] sm:aspect-[1/1] w-full overflow-hidden bg-[#F3F0EA] select-none cursor-crosshair group"
+              className="relative aspect-[4/5] sm:aspect-[1/1] w-full overflow-hidden bg-[#141312] border border-[#FAF8F5]/10 select-none cursor-crosshair group"
             >
               <AnimatePresence mode="wait">
                 <motion.div
                   key={currentImage.id}
-                  initial={{ opacity: 0, scale: 0.98 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 1.02 }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   className="w-full h-full relative"
                 >
                   <img
@@ -149,47 +158,36 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                     referrerPolicy="no-referrer"
                     style={{
                       transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-                      transform: isHovered ? 'scale(1.22)' : 'scale(1)',
+                      transform: isHovered ? 'scale(1.2)' : 'scale(1)',
                       transition: isHovered ? 'transform 0.1s ease-out' : 'transform 0.5s ease-out',
                     }}
-                    className="w-full h-full object-cover object-center pointer-events-none"
+                    className="w-full h-full object-cover object-center pointer-events-none filter contrast-[1.02]"
                   />
                 </motion.div>
               </AnimatePresence>
 
-              {/* View Label & Counter Badge */}
-              <div className="absolute top-6 left-6 flex items-center gap-3 pointer-events-none z-10">
-                <div className="bg-[#FAF9F5]/90 backdrop-blur-xs px-3.5 py-1.5 text-[10px] tracking-[0.22em] uppercase font-sans font-medium text-[#0E0D0D] border border-[#0E0D0D]/5">
-                  {currentImage.viewName}
+              {/* Refined Perspective Tag (No Cheap Numbers) */}
+              <div className="absolute top-5 left-5 pointer-events-none z-10 flex flex-col items-start gap-1">
+                <div className="bg-[#0B0A0A]/85 backdrop-blur-xs border border-[#FAF8F5]/10 px-3 py-1 text-[9px] tracking-[0.25em] uppercase font-sans text-[#FAF8F5]">
+                  {perspectiveTitles[selectedImageIndex]?.name || currentImage.viewName}
                 </div>
-                <div className="bg-[#0E0D0D] text-[#FAF9F5] px-2.5 py-1 text-[10px] tracking-[0.2em] font-sans font-medium">
-                  {currentImage.label}
+                <div className="text-[8px] tracking-[0.2em] font-sans text-[#FAF8F5]/50 px-1">
+                  {perspectiveTitles[selectedImageIndex]?.subtitle}
                 </div>
               </div>
 
-              {/* Back View Quick Feature Callout */}
-              {selectedImageIndex === 2 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="absolute bottom-6 left-6 bg-[#0E0D0D]/80 backdrop-blur-xs text-[#FAF9F5] px-3.5 py-1.5 text-[10px] tracking-[0.2em] uppercase font-sans pointer-events-none z-10"
-                >
-                  Rear Profile · Slip Pocket & Saddle Stitching
-                </motion.div>
-              )}
-
-              {/* Mobile Arrows for quick swipe alternative */}
-              <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-3 pointer-events-none sm:hidden z-10">
+              {/* Minimal Slender Navigation Arrows */}
+              <div className="absolute inset-y-0 left-0 right-0 flex items-center justify-between px-3 pointer-events-none z-10">
                 <button
                   type="button"
                   onClick={(e) => {
                     e.stopPropagation();
                     setSelectedImageIndex((prev) => (prev - 1 + product.images.length) % product.images.length);
                   }}
-                  aria-label="Previous image"
-                  className="pointer-events-auto p-2 bg-[#FAF9F5]/80 rounded-full text-[#0E0D0D] shadow-xs hover:bg-[#FAF9F5]"
+                  aria-label="Previous perspective"
+                  className="pointer-events-auto p-2.5 bg-[#0B0A0A]/60 backdrop-blur-xs text-[#FAF8F5] border border-[#FAF8F5]/10 opacity-70 hover:opacity-100 hover:bg-[#0B0A0A] transition-all"
                 >
-                  <ChevronLeft className="w-4 h-4" />
+                  <ChevronLeft className="w-4 h-4 stroke-[1.5]" />
                 </button>
                 <button
                   type="button"
@@ -197,175 +195,152 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                     e.stopPropagation();
                     setSelectedImageIndex((prev) => (prev + 1) % product.images.length);
                   }}
-                  aria-label="Next image"
-                  className="pointer-events-auto p-2 bg-[#FAF9F5]/80 rounded-full text-[#0E0D0D] shadow-xs hover:bg-[#FAF9F5]"
+                  aria-label="Next perspective"
+                  className="pointer-events-auto p-2.5 bg-[#0B0A0A]/60 backdrop-blur-xs text-[#FAF8F5] border border-[#FAF8F5]/10 opacity-70 hover:opacity-100 hover:bg-[#0B0A0A] transition-all"
                 >
-                  <ChevronRight className="w-4 h-4" />
+                  <ChevronRight className="w-4 h-4 stroke-[1.5]" />
                 </button>
               </div>
 
-              {/* Desktop Hover Zoom Hint */}
-              <div className="absolute bottom-6 right-6 hidden md:flex items-center gap-1.5 text-[9px] tracking-[0.2em] uppercase font-sans text-[#0E0D0D]/40 bg-[#FAF9F5]/75 px-2.5 py-1 pointer-events-none">
-                <Maximize2 className="w-3 h-3" />
-                <span>Hover to inspect grain</span>
+              {/* Desktop Zoom Indicator */}
+              <div className="absolute bottom-5 right-5 hidden md:flex items-center gap-2 text-[9px] tracking-[0.25em] uppercase font-sans text-[#FAF8F5]/60 bg-[#0B0A0A]/80 border border-[#FAF8F5]/10 px-3 py-1 pointer-events-none">
+                <Maximize2 className="w-3 h-3 text-[#D8CFBE]" />
+                <span>Hover to inspect leather</span>
               </div>
             </div>
 
-            {/* Four Elegant Thumbnails */}
-            <div className="grid grid-cols-4 gap-3 md:gap-4">
+            {/* Editorial Perspective Index Navigation Bar (Zero numbers or cheap dots) */}
+            <div className="grid grid-cols-4 gap-2 sm:gap-3">
               {product.images.map((img, idx) => {
                 const isActive = selectedImageIndex === idx;
+                const perspective = perspectiveTitles[idx];
 
                 return (
                   <button
                     key={img.id}
-                    id={`gallery-thumb-${idx}`}
+                    id={`gallery-perspective-${idx}`}
                     type="button"
                     onClick={() => setSelectedImageIndex(idx)}
-                    className={`relative group flex flex-col text-left transition-all duration-300 ${
-                      isActive ? 'opacity-100' : 'opacity-65 hover:opacity-90'
+                    className={`group text-left transition-all duration-300 flex flex-col space-y-2 pb-2 border-b-2 ${
+                      isActive
+                        ? 'border-[#D8CFBE] opacity-100'
+                        : 'border-transparent opacity-40 hover:opacity-80'
                     }`}
                   >
-                    <div
-                      className={`relative aspect-[1/1] w-full overflow-hidden bg-[#F3F0EA] transition-all duration-300 ${
-                        isActive ? 'ring-2 ring-[#0E0D0D] ring-offset-2 ring-offset-[#FAF9F5]' : 'ring-0'
-                      }`}
-                    >
+                    <div className="aspect-[4/3] w-full overflow-hidden bg-[#141312] border border-[#FAF8F5]/10">
                       <img
                         src={img.url}
                         alt={img.alt}
                         referrerPolicy="no-referrer"
-                        className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                        className="w-full h-full object-cover object-center group-hover:scale-103 transition-transform duration-500"
                       />
                     </div>
-                    <div className="mt-2 flex items-center justify-between text-[10px] font-sans tracking-[0.14em] uppercase text-[#0E0D0D]">
-                      <span className="truncate font-medium">{img.viewName.split(' ')[0]}</span>
-                      <span className="text-[#0E0D0D]/40">{img.label.split(' / ')[0]}</span>
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] sm:text-[10px] font-sans tracking-[0.2em] uppercase text-[#FAF8F5] font-medium">
+                        {perspective.short}
+                      </span>
                     </div>
                   </button>
                 );
               })}
             </div>
-
-            {/* Explicit Back Perspective Bar */}
-            <div className="pt-2 flex items-center justify-between bg-[#F3F0EA] p-4 text-xs font-sans text-[#0E0D0D]">
-              <div>
-                <p className="font-medium tracking-wide">360° Studio Photography Standard</p>
-                <p className="text-[#0E0D0D]/60 text-[11px]">
-                  All angles photographed in natural daylight. Rear elevation highlights flush pocket tailoring.
-                </p>
-              </div>
-              <button
-                type="button"
-                id="inspect-rear-view-btn"
-                onClick={() => setSelectedImageIndex(2)}
-                className={`px-3 py-1.5 text-[11px] tracking-[0.18em] uppercase font-medium border transition-colors ${
-                  selectedImageIndex === 2
-                    ? 'bg-[#0E0D0D] text-[#FAF9F5] border-[#0E0D0D]'
-                    : 'border-[#0E0D0D]/30 hover:border-[#0E0D0D] text-[#0E0D0D]'
-                }`}
-              >
-                Inspect Rear (03)
-              </button>
-            </div>
           </div>
 
-          {/* RIGHT: Product Information & Purchase */}
+          {/* RIGHT: Product Information & Restrained Purchase Panel */}
           <div className="lg:col-span-5 flex flex-col space-y-8">
             {/* Header Titles */}
-            <div className="space-y-4">
-              <span className="text-xs tracking-[0.3em] uppercase font-sans text-[#0E0D0D]/50 font-medium block">
-                Permanent Collection
+            <div className="space-y-3">
+              <span className="text-[9px] tracking-[0.35em] uppercase font-sans text-[#D8CFBE] block">
+                Atelier Leather Collection
               </span>
-              <h1 className="font-serif text-4xl sm:text-5xl text-[#0E0D0D] font-normal leading-[1.05]">
+              <h1 className="font-serif text-4xl sm:text-5xl md:text-6xl text-[#FAF8F5] font-normal leading-[0.98]">
                 {product.name}
               </h1>
-              <div className="flex items-baseline gap-4 pt-1">
-                <span className="font-serif text-3xl text-[#0E0D0D]">
+              <div className="flex items-baseline gap-4 pt-2">
+                <span className="font-serif text-3xl sm:text-4xl text-[#FAF8F5]">
                   {product.formattedPrice}
                 </span>
-                <span className="text-xs tracking-[0.18em] uppercase font-sans text-[#0E0D0D]/50">
-                  Import Duties & GST Included
+                <span className="text-[10px] tracking-[0.25em] uppercase font-sans text-[#FAF8F5]/40">
+                  Taxes & Insured Courier Included
                 </span>
               </div>
             </div>
 
             {/* Description Statement */}
-            <p className="text-[#232220]/85 text-base leading-relaxed font-sans font-light border-l-2 border-[#0E0D0D] pl-4">
+            <p className="text-xs sm:text-sm font-sans font-light text-[#FAF8F5]/80 leading-relaxed border-l border-[#D8CFBE]/40 pl-4">
               {product.description}
             </p>
 
-            {/* Color Selector */}
-            <div className="space-y-3 pt-2">
-              <div className="flex items-center justify-between text-xs tracking-[0.2em] uppercase font-sans">
-                <span className="font-medium text-[#0E0D0D]">Color</span>
-                <span className="text-[#0E0D0D]/70">{product.color}</span>
+            {/* Colorway Indicator */}
+            <div className="space-y-2 pt-1">
+              <div className="flex items-center justify-between text-[10px] tracking-[0.25em] uppercase font-sans">
+                <span className="font-medium text-[#FAF8F5]">Colorway</span>
+                <span className="text-[#D8CFBE]">{product.color}</span>
               </div>
               <div className="flex items-center gap-3">
-                <button
-                  type="button"
+                <div
                   aria-label="Noir Black"
-                  className="w-8 h-8 rounded-full bg-[#121212] ring-2 ring-offset-2 ring-offset-[#FAF9F5] ring-[#0E0D0D] transition-transform hover:scale-105"
+                  className="w-5 h-5 rounded-full bg-[#050505] ring-1 ring-offset-2 ring-offset-[#0E0D0D] ring-[#D8CFBE]"
                 />
-                <span className="text-xs font-sans text-[#0E0D0D]/60 tracking-wider">
-                  Signature Matte Noir Calfskin
+                <span className="text-xs font-sans text-[#FAF8F5]/60">
+                  European Drum-Dyed Noir Calfskin
                 </span>
               </div>
             </div>
 
             {/* Quantity Selector & Action Controls */}
-            <div className="space-y-4 pt-2">
+            <div className="space-y-4 pt-1">
               <div className="flex items-center gap-4">
-                <span className="text-xs tracking-[0.2em] uppercase font-sans font-medium text-[#0E0D0D]">
+                <span className="text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5]/70">
                   Quantity
                 </span>
-                <div className="flex items-center border border-[#0E0D0D]/20 bg-[#FAF9F5]">
+                <div className="flex items-center border border-[#FAF8F5]/20 bg-[#141312]">
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                     aria-label="Decrease quantity"
-                    className="p-2 text-[#0E0D0D]/70 hover:text-[#0E0D0D] transition-colors"
+                    className="px-3 py-2 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/5 transition-colors"
                   >
-                    <Minus className="w-3.5 h-3.5" />
+                    <Minus className="w-3 h-3" />
                   </button>
-                  <span className="w-10 text-center text-xs font-sans font-medium text-[#0E0D0D]">
+                  <span className="w-8 text-center text-xs font-sans font-medium text-[#FAF8F5]">
                     {quantity}
                   </span>
                   <button
                     type="button"
                     onClick={() => setQuantity((q) => Math.min(5, q + 1))}
                     aria-label="Increase quantity"
-                    className="p-2 text-[#0E0D0D]/70 hover:text-[#0E0D0D] transition-colors"
+                    className="px-3 py-2 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:bg-[#FAF8F5]/5 transition-colors"
                   >
-                    <Plus className="w-3.5 h-3.5" />
+                    <Plus className="w-3 h-3" />
                   </button>
                 </div>
               </div>
 
-              {/* Add to Bag & Wishlist Buttons */}
-              <div className="flex items-center gap-4 pt-2">
+              {/* Slim, Refined Action Buttons */}
+              <div className="flex items-center gap-3 pt-2">
                 <button
                   id="add-to-bag-button"
                   type="button"
                   onClick={handleAdd}
                   disabled={isAdding}
-                  className={`flex-1 relative overflow-hidden h-14 flex items-center justify-center text-[12px] tracking-[0.22em] uppercase font-sans font-medium transition-all duration-500 ${
+                  className={`flex-1 relative overflow-hidden h-12 flex items-center justify-center text-[10px] tracking-[0.28em] uppercase font-sans font-medium transition-all duration-300 ${
                     addedSuccess
-                      ? 'bg-[#1C3B2B] text-[#FAF9F5]'
-                      : 'bg-[#0E0D0D] text-[#FAF9F5] hover:bg-[#232220]'
+                      ? 'bg-[#1C3B2B] text-[#FAF8F5]'
+                      : 'bg-[#FAF8F5] text-[#0B0A0A] hover:bg-[#D8CFBE]'
                   }`}
                 >
                   <AnimatePresence mode="wait">
                     {addedSuccess ? (
                       <motion.div
                         key="added"
-                        initial={{ opacity: 0, y: 10 }}
+                        initial={{ opacity: 0, y: 4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
+                        exit={{ opacity: 0, y: -4 }}
                         className="flex items-center gap-2"
                       >
-                        <Check className="w-4 h-4" />
-                        <span>Added to Bag</span>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Secured to Bag</span>
                       </motion.div>
                     ) : isAdding ? (
                       <motion.div
@@ -375,65 +350,49 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                         exit={{ opacity: 0 }}
                         className="flex items-center gap-2"
                       >
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        <span>Securing Item...</span>
+                        <span className="animate-pulse">Securing...</span>
                       </motion.div>
                     ) : (
                       <motion.div
-                        key="idle"
+                        key="default"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="flex items-center gap-2"
                       >
                         <span>Add to Bag</span>
-                        <span className="text-[#FAF9F5]/50">·</span>
-                        <span>PKR {(product.price * quantity).toLocaleString()}</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
                 </button>
 
                 <button
-                  id="wishlist-toggle-btn"
+                  id="wishlist-toggle-button"
                   type="button"
                   onClick={onToggleWishlist}
-                  aria-label={isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
-                  className={`h-14 w-14 flex items-center justify-center border transition-all duration-300 ${
+                  aria-label={isInWishlist ? 'Remove from wishlist' : 'Save to wishlist'}
+                  className={`h-12 w-12 flex items-center justify-center border transition-colors ${
                     isInWishlist
-                      ? 'border-[#0E0D0D] bg-[#0E0D0D] text-[#FAF9F5]'
-                      : 'border-[#0E0D0D]/20 text-[#0E0D0D] hover:border-[#0E0D0D] bg-transparent'
+                      ? 'border-[#D8CFBE] bg-[#FAF8F5]/10 text-[#D8CFBE]'
+                      : 'border-[#FAF8F5]/20 text-[#FAF8F5]/70 hover:text-[#FAF8F5] hover:border-[#FAF8F5]/50'
                   }`}
                 >
-                  <Heart className={`w-5 h-5 ${isInWishlist ? 'fill-current' : ''}`} />
+                  <Heart className={`w-4 h-4 ${isInWishlist ? 'fill-current' : ''}`} />
                 </button>
               </div>
             </div>
 
-            {/* Quick Guarantees */}
-            <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#0E0D0D]/10 text-xs font-sans text-[#0E0D0D]/70">
-              <div className="flex items-center gap-2.5">
-                <Truck className="w-4 h-4 text-[#0E0D0D]" />
-                <span>Complimentary Delivery</span>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <RotateCcw className="w-4 h-4 text-[#0E0D0D]" />
-                <span>14-Day Returns</span>
-              </div>
-            </div>
-
-            {/* Editorial Accordions */}
-            <div className="border-t border-[#0E0D0D]/10 divide-y divide-[#0E0D0D]/10">
+            {/* Atelier Accordions */}
+            <div className="border-t border-[#FAF8F5]/10 pt-4 divide-y divide-[#FAF8F5]/10">
               {/* Product Details */}
               <div className="py-4">
                 <button
                   type="button"
                   onClick={() => toggleAccordion('details')}
-                  className="w-full flex items-center justify-between text-left text-xs tracking-[0.2em] uppercase font-sans font-medium text-[#0E0D0D]"
+                  className="w-full flex items-center justify-between text-left text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5]"
                 >
                   <span>Product Details</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${
+                    className={`w-3.5 h-3.5 text-[#FAF8F5]/60 transition-transform duration-300 ${
                       openAccordion === 'details' ? 'rotate-180' : ''
                     }`}
                   />
@@ -444,10 +403,10 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <ul className="pt-4 space-y-2 text-xs font-sans text-[#232220]/80 leading-relaxed list-disc list-inside">
+                      <ul className="pt-3 space-y-2 text-xs font-sans font-light text-[#FAF8F5]/70 leading-relaxed list-disc list-inside">
                         {product.details.map((item, idx) => (
                           <li key={idx}>{item}</li>
                         ))}
@@ -462,11 +421,11 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleAccordion('materials')}
-                  className="w-full flex items-center justify-between text-left text-xs tracking-[0.2em] uppercase font-sans font-medium text-[#0E0D0D]"
+                  className="w-full flex items-center justify-between text-left text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5]"
                 >
                   <span>Materials & Origins</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${
+                    className={`w-3.5 h-3.5 text-[#FAF8F5]/60 transition-transform duration-300 ${
                       openAccordion === 'materials' ? 'rotate-180' : ''
                     }`}
                   />
@@ -477,10 +436,10 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <ul className="pt-4 space-y-2 text-xs font-sans text-[#232220]/80 leading-relaxed list-disc list-inside">
+                      <ul className="pt-3 space-y-2 text-xs font-sans font-light text-[#FAF8F5]/70 leading-relaxed list-disc list-inside">
                         {product.materials.map((mat, idx) => (
                           <li key={idx}>{mat}</li>
                         ))}
@@ -495,11 +454,11 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleAccordion('dimensions')}
-                  className="w-full flex items-center justify-between text-left text-xs tracking-[0.2em] uppercase font-sans font-medium text-[#0E0D0D]"
+                  className="w-full flex items-center justify-between text-left text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5]"
                 >
                   <span>Dimensions & Fit</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${
+                    className={`w-3.5 h-3.5 text-[#FAF8F5]/60 transition-transform duration-300 ${
                       openAccordion === 'dimensions' ? 'rotate-180' : ''
                     }`}
                   />
@@ -510,17 +469,14 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <div className="pt-4 space-y-2 text-xs font-sans text-[#232220]/80">
-                        <p><strong className="text-[#0E0D0D]">Height:</strong> {product.dimensions.height}</p>
-                        <p><strong className="text-[#0E0D0D]">Width:</strong> {product.dimensions.width}</p>
-                        <p><strong className="text-[#0E0D0D]">Depth:</strong> {product.dimensions.depth}</p>
-                        <p><strong className="text-[#0E0D0D]">Strap Drop:</strong> {product.dimensions.strapDrop}</p>
-                        <p className="text-[#0E0D0D]/60 pt-1">
-                          Comfortably accommodates an iPhone Pro Max, cardholder, cosmetics pouch, and keys.
-                        </p>
+                      <div className="pt-3 space-y-2 text-xs font-sans font-light text-[#FAF8F5]/70">
+                        <p><strong className="text-[#FAF8F5] font-medium">Height:</strong> {product.dimensions.height}</p>
+                        <p><strong className="text-[#FAF8F5] font-medium">Width:</strong> {product.dimensions.width}</p>
+                        <p><strong className="text-[#FAF8F5] font-medium">Depth:</strong> {product.dimensions.depth}</p>
+                        <p><strong className="text-[#FAF8F5] font-medium">Strap Drop:</strong> {product.dimensions.strapDrop}</p>
                       </div>
                     </motion.div>
                   )}
@@ -532,11 +488,11 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleAccordion('shipping')}
-                  className="w-full flex items-center justify-between text-left text-xs tracking-[0.2em] uppercase font-sans font-medium text-[#0E0D0D]"
+                  className="w-full flex items-center justify-between text-left text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5]"
                 >
-                  <span>Shipping & Packaging</span>
+                  <span>Shipping & Courier</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${
+                    className={`w-3.5 h-3.5 text-[#FAF8F5]/60 transition-transform duration-300 ${
                       openAccordion === 'shipping' ? 'rotate-180' : ''
                     }`}
                   />
@@ -547,10 +503,10 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <p className="pt-4 text-xs font-sans text-[#232220]/80 leading-relaxed">
+                      <p className="pt-3 text-xs font-sans font-light text-[#FAF8F5]/70 leading-relaxed">
                         {product.shippingInfo}
                       </p>
                     </motion.div>
@@ -563,11 +519,11 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                 <button
                   type="button"
                   onClick={() => toggleAccordion('returns')}
-                  className="w-full flex items-center justify-between text-left text-xs tracking-[0.2em] uppercase font-sans font-medium text-[#0E0D0D]"
+                  className="w-full flex items-center justify-between text-left text-[10px] tracking-[0.25em] uppercase font-sans font-medium text-[#FAF8F5]"
                 >
-                  <span>Returns & Guarantee</span>
+                  <span>Exchange & Archive Policy</span>
                   <ChevronDown
-                    className={`w-4 h-4 transition-transform duration-300 ${
+                    className={`w-3.5 h-3.5 text-[#FAF8F5]/60 transition-transform duration-300 ${
                       openAccordion === 'returns' ? 'rotate-180' : ''
                     }`}
                   />
@@ -578,10 +534,10 @@ export const ProductDetailSection: React.FC<ProductDetailSectionProps> = ({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.3 }}
                       className="overflow-hidden"
                     >
-                      <p className="pt-4 text-xs font-sans text-[#232220]/80 leading-relaxed">
+                      <p className="pt-3 text-xs font-sans font-light text-[#FAF8F5]/70 leading-relaxed">
                         {product.returnsInfo}
                       </p>
                     </motion.div>

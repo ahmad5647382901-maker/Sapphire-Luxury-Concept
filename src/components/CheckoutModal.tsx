@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Check, ShieldCheck, Truck, ArrowRight } from 'lucide-react';
+import { X, ShieldCheck, Truck, Check, ArrowRight } from 'lucide-react';
 import { CartItem } from '../types';
 
 interface CheckoutModalProps {
@@ -32,13 +32,16 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!fullName || !phone || !address) return;
+
     setIsProcessing(true);
     setTimeout(() => {
       setIsProcessing(false);
-      setOrderRef(`SPH-${Math.floor(100000 + Math.random() * 900000)}`);
+      const randomCode = 'SPH-' + Math.floor(100000 + Math.random() * 900000);
+      setOrderRef(randomCode);
       setOrderSuccess(true);
       onOrderComplete();
-    }, 900);
+    }, 800);
   };
 
   const handleFinish = () => {
@@ -56,57 +59,57 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
-            className="fixed inset-0 bg-[#0E0D0D]/60 backdrop-blur-sm"
+            className="fixed inset-0 bg-black/80 backdrop-blur-xs"
           />
 
           {/* Modal Content */}
           <div className="min-h-full flex items-center justify-center p-4 sm:p-6 relative">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              initial={{ opacity: 0, scale: 0.98, y: 15 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              exit={{ opacity: 0, scale: 0.98, y: 15 }}
               transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-              className="relative w-full max-w-2xl bg-[#FAF9F5] shadow-2xl p-6 sm:p-10 border border-[#0E0D0D]/10"
+              className="relative w-full max-w-xl bg-[#0E0D0D] text-[#FAF8F5] shadow-2xl p-6 sm:p-10 border border-[#FAF8F5]/10"
             >
               {/* Close Button */}
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close checkout"
-                className="absolute top-6 right-6 p-2 text-[#0E0D0D] hover:opacity-60 transition-opacity"
+                className="absolute top-6 right-6 p-1.5 text-[#FAF8F5]/60 hover:text-[#FAF8F5] transition-colors"
               >
-                <X className="w-5 h-5" />
+                <X className="w-4 h-4" />
               </button>
 
               {orderSuccess ? (
                 <div className="py-8 text-center space-y-6">
-                  <div className="w-16 h-16 rounded-full bg-[#1C3B2B] text-[#FAF9F5] flex items-center justify-center mx-auto shadow-lg">
-                    <Check className="w-8 h-8" />
+                  <div className="w-12 h-12 rounded-full bg-[#141312] border border-[#FAF8F5]/20 text-[#D8CFBE] flex items-center justify-center mx-auto shadow-sm">
+                    <Check className="w-6 h-6" />
                   </div>
                   <div className="space-y-2">
-                    <span className="text-[10px] tracking-[0.3em] uppercase font-sans text-[#0E0D0D]/50">
-                      Order Confirmed
+                    <span className="text-[9px] tracking-[0.35em] uppercase font-sans text-[#D8CFBE]/70">
+                      Acquisition Confirmed
                     </span>
-                    <h3 className="font-serif text-3xl sm:text-4xl text-[#0E0D0D]">
-                      Thank You, {fullName || 'Valued Client'}
+                    <h3 className="font-serif text-3xl sm:text-4xl text-[#FAF8F5]">
+                      Thank You, {fullName || 'Valued Patron'}
                     </h3>
-                    <p className="text-xs tracking-widest font-sans text-[#0E0D0D]/70">
-                      Reference Code: <strong className="text-[#0E0D0D]">{orderRef}</strong>
+                    <p className="text-xs tracking-widest font-sans text-[#D8CFBE]/80">
+                      Reference Code: <strong className="text-[#FAF8F5]">{orderRef}</strong>
                     </p>
                   </div>
 
-                  <p className="text-sm font-sans text-[#232220]/75 max-w-md mx-auto leading-relaxed">
-                    Your bespoke shipment has been registered at our Lahore atelier. A personal
-                    concierge has dispatched confirmation details and live courier tracking.
+                  <p className="text-xs sm:text-sm font-sans font-light text-[#FAF8F5]/70 max-w-md mx-auto leading-relaxed">
+                    Your bespoke shipment has been registered at our Lahore atelier. A private
+                    concierge has dispatched confirmation details and secure courier tracking.
                   </p>
 
-                  <div className="pt-4">
+                  <div className="pt-3">
                     <button
                       type="button"
                       onClick={handleFinish}
-                      className="px-8 py-3.5 bg-[#0E0D0D] text-[#FAF9F5] text-xs tracking-[0.2em] uppercase font-sans font-medium hover:bg-[#232220] transition-colors"
+                      className="px-8 py-3 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium hover:bg-[#D8CFBE] transition-colors"
                     >
-                      Return to Journal
+                      Return to Lookbook
                     </button>
                   </div>
                 </div>
@@ -114,24 +117,24 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                 <div className="space-y-8">
                   {/* Header */}
                   <div>
-                    <span className="text-[10px] tracking-[0.3em] uppercase font-sans text-[#0E0D0D]/50">
-                      White-Glove Service
+                    <span className="text-[9px] tracking-[0.35em] uppercase font-sans text-[#D8CFBE]/60">
+                      Private Atelier Concierge
                     </span>
-                    <h3 className="font-serif text-3xl text-[#0E0D0D]">
-                      Acquire Archive Pieces
+                    <h3 className="font-serif text-3xl text-[#FAF8F5] pt-1">
+                      Complete Acquisition
                     </h3>
                   </div>
 
                   <form onSubmit={handleSubmit} className="space-y-6">
                     {/* Items brief */}
-                    <div className="bg-[#F3F0EA] p-4 text-xs font-sans flex justify-between items-center">
+                    <div className="bg-[#141312] border border-[#FAF8F5]/10 p-4 text-xs font-sans flex justify-between items-center">
                       <div>
-                        <span className="font-medium text-[#0E0D0D]">
+                        <span className="font-medium text-[#FAF8F5]">
                           {items.reduce((sum, i) => sum + i.quantity, 0)} Archive Selection(s)
                         </span>
-                        <p className="text-[#0E0D0D]/60 mt-0.5">Complimentary Insured Delivery</p>
+                        <p className="text-[10px] text-[#D8CFBE]/70 mt-0.5">Complimentary Insured Courier</p>
                       </div>
-                      <span className="font-serif text-lg text-[#0E0D0D]">
+                      <span className="font-serif text-lg text-[#FAF8F5]">
                         PKR {subtotal.toLocaleString()}
                       </span>
                     </div>
@@ -139,7 +142,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                     {/* Inputs */}
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
                       <div>
-                        <label className="block text-[10px] tracking-[0.18em] uppercase text-[#0E0D0D]/60 mb-1">
+                        <label className="block text-[9px] tracking-[0.25em] uppercase text-[#D8CFBE]/70 mb-1">
                           Full Name
                         </label>
                         <input
@@ -148,12 +151,12 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           value={fullName}
                           onChange={(e) => setFullName(e.target.value)}
                           placeholder="e.g. Ayla Khan"
-                          className="w-full p-3 bg-transparent border border-[#0E0D0D]/20 focus:border-[#0E0D0D] outline-none"
+                          className="w-full p-2.5 bg-transparent border border-[#FAF8F5]/20 focus:border-[#FAF8F5] text-[#FAF8F5] placeholder:text-[#FAF8F5]/30 outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[10px] tracking-[0.18em] uppercase text-[#0E0D0D]/60 mb-1">
+                        <label className="block text-[9px] tracking-[0.25em] uppercase text-[#D8CFBE]/70 mb-1">
                           Contact Phone
                         </label>
                         <input
@@ -162,40 +165,40 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           value={phone}
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="+92 300 1234567"
-                          className="w-full p-3 bg-transparent border border-[#0E0D0D]/20 focus:border-[#0E0D0D] outline-none"
+                          className="w-full p-2.5 bg-transparent border border-[#FAF8F5]/20 focus:border-[#FAF8F5] text-[#FAF8F5] placeholder:text-[#FAF8F5]/30 outline-none"
                         />
                       </div>
 
                       <div>
-                        <label className="block text-[10px] tracking-[0.18em] uppercase text-[#0E0D0D]/60 mb-1">
+                        <label className="block text-[9px] tracking-[0.25em] uppercase text-[#D8CFBE]/70 mb-1">
                           City
                         </label>
                         <select
                           value={city}
                           onChange={(e) => setCity(e.target.value)}
-                          className="w-full p-3 bg-transparent border border-[#0E0D0D]/20 focus:border-[#0E0D0D] outline-none text-[#0E0D0D]"
+                          className="w-full p-2.5 bg-[#141312] border border-[#FAF8F5]/20 focus:border-[#FAF8F5] outline-none text-[#FAF8F5]"
                         >
-                          <option value="Lahore">Lahore</option>
-                          <option value="Karachi">Karachi</option>
-                          <option value="Islamabad">Islamabad</option>
-                          <option value="Rawalpindi">Rawalpindi</option>
-                          <option value="Faisalabad">Faisalabad</option>
-                          <option value="Peshawar">Peshawar</option>
+                          <option value="Lahore" className="bg-[#141312] text-[#FAF8F5]">Lahore</option>
+                          <option value="Karachi" className="bg-[#141312] text-[#FAF8F5]">Karachi</option>
+                          <option value="Islamabad" className="bg-[#141312] text-[#FAF8F5]">Islamabad</option>
+                          <option value="Rawalpindi" className="bg-[#141312] text-[#FAF8F5]">Rawalpindi</option>
+                          <option value="Faisalabad" className="bg-[#141312] text-[#FAF8F5]">Faisalabad</option>
+                          <option value="Peshawar" className="bg-[#141312] text-[#FAF8F5]">Peshawar</option>
                         </select>
                       </div>
 
                       <div>
-                        <label className="block text-[10px] tracking-[0.18em] uppercase text-[#0E0D0D]/60 mb-1">
-                          Payment Method
+                        <label className="block text-[9px] tracking-[0.25em] uppercase text-[#D8CFBE]/70 mb-1">
+                          Payment Mode
                         </label>
-                        <div className="grid grid-cols-2 gap-2 h-[46px]">
+                        <div className="grid grid-cols-2 gap-2 h-[41px]">
                           <button
                             type="button"
                             onClick={() => setPaymentMethod('card')}
-                            className={`px-2 text-[10px] tracking-wider uppercase border transition-colors ${
+                            className={`px-2 text-[9px] tracking-wider uppercase border transition-colors ${
                               paymentMethod === 'card'
-                                ? 'bg-[#0E0D0D] text-[#FAF9F5] border-[#0E0D0D]'
-                                : 'border-[#0E0D0D]/20 text-[#0E0D0D]'
+                                ? 'bg-[#FAF8F5] text-[#0B0A0A] border-[#FAF8F5]'
+                                : 'border-[#FAF8F5]/20 text-[#FAF8F5]/70 hover:text-[#FAF8F5]'
                             }`}
                           >
                             Card / Online
@@ -203,10 +206,10 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           <button
                             type="button"
                             onClick={() => setPaymentMethod('cod')}
-                            className={`px-2 text-[10px] tracking-wider uppercase border transition-colors ${
+                            className={`px-2 text-[9px] tracking-wider uppercase border transition-colors ${
                               paymentMethod === 'cod'
-                                ? 'bg-[#0E0D0D] text-[#FAF9F5] border-[#0E0D0D]'
-                                : 'border-[#0E0D0D]/20 text-[#0E0D0D]'
+                                ? 'bg-[#FAF8F5] text-[#0B0A0A] border-[#FAF8F5]'
+                                : 'border-[#FAF8F5]/20 text-[#FAF8F5]/70 hover:text-[#FAF8F5]'
                             }`}
                           >
                             White Glove COD
@@ -215,7 +218,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label className="block text-[10px] tracking-[0.18em] uppercase text-[#0E0D0D]/60 mb-1">
+                        <label className="block text-[9px] tracking-[0.25em] uppercase text-[#D8CFBE]/70 mb-1">
                           Delivery Address
                         </label>
                         <input
@@ -224,7 +227,7 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                           value={address}
                           onChange={(e) => setAddress(e.target.value)}
                           placeholder="House / Apartment, Street, Phase / Sector"
-                          className="w-full p-3 bg-transparent border border-[#0E0D0D]/20 focus:border-[#0E0D0D] outline-none"
+                          className="w-full p-2.5 bg-transparent border border-[#FAF8F5]/20 focus:border-[#FAF8F5] text-[#FAF8F5] placeholder:text-[#FAF8F5]/30 outline-none"
                         />
                       </div>
                     </div>
@@ -234,29 +237,29 @@ export const CheckoutModal: React.FC<CheckoutModalProps> = ({
                       id="submit-order-btn"
                       type="submit"
                       disabled={isProcessing}
-                      className="w-full py-4 bg-[#0E0D0D] text-[#FAF9F5] text-xs tracking-[0.22em] uppercase font-sans font-medium transition-all hover:bg-[#232220] flex items-center justify-center gap-3"
+                      className="w-full py-3.5 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.25em] uppercase font-sans font-medium transition-colors hover:bg-[#D8CFBE] flex items-center justify-center gap-3"
                     >
                       {isProcessing ? (
                         <div className="flex items-center gap-2">
-                          <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                          <span className="w-3.5 h-3.5 border-2 border-[#0B0A0A]/30 border-t-[#0B0A0A] rounded-full animate-spin" />
                           <span>Authorizing Order...</span>
                         </div>
                       ) : (
                         <>
-                          <span>Complete Order · PKR {subtotal.toLocaleString()}</span>
-                          <ArrowRight className="w-4 h-4" />
+                          <span>Authorize Acquisition · PKR {subtotal.toLocaleString()}</span>
+                          <ArrowRight className="w-3.5 h-3.5" />
                         </>
                       )}
                     </button>
 
-                    <div className="flex items-center justify-center gap-6 text-[10px] tracking-wider uppercase font-sans text-[#0E0D0D]/50 pt-2">
+                    <div className="flex items-center justify-center gap-6 text-[9px] tracking-wider uppercase font-sans text-[#D8CFBE]/60 pt-2">
                       <div className="flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5" />
-                        <span>Insured Courier</span>
+                        <ShieldCheck className="w-3 h-3 text-[#D8CFBE]" />
+                        <span>Insured Delivery</span>
                       </div>
                       <div className="flex items-center gap-1.5">
-                        <Truck className="w-3.5 h-3.5" />
-                        <span>Dispatched from Lahore</span>
+                        <Truck className="w-3 h-3 text-[#D8CFBE]" />
+                        <span>Dispatched from Lahore Atelier</span>
                       </div>
                     </div>
                   </form>

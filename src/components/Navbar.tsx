@@ -24,11 +24,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
   useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 40) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
+      setIsScrolled(window.scrollY > 30);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -36,10 +32,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   const navLinks = [
-    { name: 'New In', target: 'section-new-edition' },
-    { name: 'Collections', target: 'section-collections' },
-    { name: 'Hero Piece', target: 'section-product-story' },
-    { name: 'Craftsmanship', target: 'section-craftsmanship' },
+    { name: 'Edition', target: 'section-new-edition' },
+    { name: 'Anthology', target: 'section-collections' },
+    { name: 'Hero Object', target: 'section-product-story' },
+    { name: 'Craft', target: 'section-craftsmanship' },
     { name: 'Acquire', target: 'section-product-detail' },
   ];
 
@@ -47,64 +43,65 @@ export const Navbar: React.FC<NavbarProps> = ({
     <>
       <header
         id="main-navigation"
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-700 ease-out ${
+        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-500 ease-out ${
           isScrolled
-            ? 'bg-[#FAF9F5]/90 backdrop-blur-md py-3.5 border-b border-[#0E0D0D]/8 shadow-[0_4px_24px_rgba(0,0,0,0.02)] text-[#0E0D0D]'
-            : 'bg-transparent py-6 md:py-8 text-[#0E0D0D]'
+            ? 'bg-[#0B0A0A]/95 backdrop-blur-sm py-4 border-b border-[#FAF8F5]/10 text-[#FAF8F5]'
+            : 'bg-transparent py-7 md:py-8 text-[#FAF8F5]'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-6 sm:px-8 md:px-12 flex items-center justify-between">
-          {/* Mobile Menu Toggle & Brand Left */}
-          <div className="flex items-center gap-6">
+        <div className="w-full max-w-7xl mx-auto px-6 sm:px-10 md:px-14 flex items-center justify-between">
+          {/* Desktop Left: Minimal Luxury Wordmark */}
+          <div className="flex items-center gap-4">
             <button
               id="mobile-menu-trigger"
               type="button"
               onClick={() => setMobileMenuOpen(true)}
               aria-label="Open menu"
-              className="md:hidden p-1.5 -ml-1.5 text-[#0E0D0D] hover:opacity-70 transition-opacity"
+              className="md:hidden p-1 -ml-1 text-[#FAF8F5] hover:opacity-60 transition-opacity"
             >
-              <Menu className="w-5 h-5" />
+              <Menu className="w-5 h-5 stroke-[1.5]" />
             </button>
 
-            {/* Desktop Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-8 text-[13px] tracking-[0.14em] uppercase font-sans font-medium text-[#0E0D0D]/85">
-              {navLinks.map((item) => (
-                <button
-                  key={item.name}
-                  id={`nav-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
-                  type="button"
-                  onClick={() => onNavigateSection(item.target)}
-                  className="relative py-1 group transition-colors hover:text-[#0E0D0D]"
-                >
-                  <span>{item.name}</span>
-                  <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#0E0D0D] transition-all duration-300 ease-out group-hover:w-full" />
-                </button>
-              ))}
-            </nav>
-          </div>
-
-          {/* Center Logo */}
-          <div className="absolute left-1/2 -translate-x-1/2 text-center select-none cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-            <div className="flex flex-col items-center">
-              <span className="font-serif text-2xl md:text-3xl tracking-[0.28em] font-normal uppercase text-[#0E0D0D]">
+            <button
+              type="button"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="text-left group cursor-pointer"
+            >
+              <span className="font-serif text-xl sm:text-2xl tracking-[0.24em] font-normal uppercase text-[#FAF8F5] block">
                 SAPPHIRE
               </span>
-              <span className="text-[8px] tracking-[0.38em] uppercase text-[#0E0D0D]/50 -mt-1 font-sans hidden sm:block">
-                Editorial Concept
+              <span className="text-[8px] tracking-[0.36em] uppercase text-[#D8CFBE]/70 font-sans block -mt-0.5">
+                Editorial Study
               </span>
-            </div>
+            </button>
           </div>
 
-          {/* Right Utilities */}
-          <div className="flex items-center space-x-5 md:space-x-7">
+          {/* Center: Minimal Navigation */}
+          <nav className="hidden md:flex items-center space-x-10 text-[11px] tracking-[0.22em] uppercase font-sans font-medium text-[#FAF8F5]/70">
+            {navLinks.map((item) => (
+              <button
+                key={item.name}
+                id={`nav-link-${item.name.toLowerCase().replace(/\s+/g, '-')}`}
+                type="button"
+                onClick={() => onNavigateSection(item.target)}
+                className="relative py-1 group transition-colors duration-300 hover:text-[#FAF8F5]"
+              >
+                <span>{item.name}</span>
+                <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-[#FAF8F5] transition-all duration-300 ease-out group-hover:w-full" />
+              </button>
+            ))}
+          </nav>
+
+          {/* Right: Search / Wishlist / Bag Controls */}
+          <div className="flex items-center space-x-5 sm:space-x-7">
             <button
               id="search-button-trigger"
               type="button"
               onClick={onOpenSearch}
-              aria-label="Search catalog"
-              className="p-1.5 text-[#0E0D0D]/85 hover:text-[#0E0D0D] transition-all hover:scale-105"
+              aria-label="Search collection"
+              className="p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors"
             >
-              <Search className="w-[18px] h-[18px]" />
+              <Search className="w-[17px] h-[17px] stroke-[1.5]" />
             </button>
 
             <button
@@ -112,11 +109,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               onClick={onOpenWishlist}
               aria-label="View wishlist"
-              className="relative p-1.5 text-[#0E0D0D]/85 hover:text-[#0E0D0D] transition-all hover:scale-105"
+              className="relative p-1 text-[#FAF8F5]/70 hover:text-[#FAF8F5] transition-colors"
             >
-              <Heart className="w-[18px] h-[18px]" />
+              <Heart className="w-[17px] h-[17px] stroke-[1.5]" />
               {wishlistCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-[#0E0D0D] text-[#FAF9F5] text-[9px] font-sans font-medium flex items-center justify-center">
+                <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-[#D8CFBE] text-[#0B0A0A] text-[8px] font-sans font-medium flex items-center justify-center">
                   {wishlistCount}
                 </span>
               )}
@@ -127,17 +124,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               type="button"
               onClick={onOpenCart}
               aria-label="View shopping bag"
-              className="group relative flex items-center gap-2 p-1.5 text-[#0E0D0D] hover:opacity-85 transition-all"
+              className="group flex items-center gap-2 p-1 text-[#FAF8F5]/85 hover:text-[#FAF8F5] transition-colors"
             >
               <div className="relative">
-                <ShoppingBag className="w-[18px] h-[18px]" />
+                <ShoppingBag className="w-[17px] h-[17px] stroke-[1.5]" />
                 {cartCount > 0 && (
-                  <span className="absolute -top-1.5 -right-2 min-w-4 h-4 px-1 rounded-full bg-[#0E0D0D] text-[#FAF9F5] text-[9px] font-sans font-medium flex items-center justify-center">
+                  <span className="absolute -top-1.5 -right-2 min-w-3.5 h-3.5 px-1 rounded-full bg-[#D8CFBE] text-[#0B0A0A] text-[8px] font-sans font-medium flex items-center justify-center">
                     {cartCount}
                   </span>
                 )}
               </div>
-              <span className="hidden lg:inline text-[11px] tracking-[0.16em] uppercase font-sans font-medium text-[#0E0D0D]/80 group-hover:text-[#0E0D0D]">
+              <span className="hidden lg:inline text-[10px] tracking-[0.2em] uppercase font-sans font-medium text-[#FAF8F5]/70 group-hover:text-[#FAF8F5]">
                 Bag
               </span>
             </button>
@@ -145,34 +142,36 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       </header>
 
-      {/* Mobile Full-Screen Editorial Menu */}
+      {/* Mobile Editorial Overlay Menu */}
       <AnimatePresence>
         {mobileMenuOpen && (
           <motion.div
             id="mobile-navigation-drawer"
-            initial={{ opacity: 0, y: -20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed inset-0 z-50 bg-[#FAF9F5] flex flex-col justify-between p-8 sm:p-12 text-[#0E0D0D]"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="fixed inset-0 z-50 bg-[#0B0A0A] flex flex-col justify-between p-7 sm:p-10 text-[#FAF8F5]"
           >
-            {/* Top Bar inside Menu */}
-            <div className="flex items-center justify-between border-b border-[#0E0D0D]/10 pb-6">
-              <span className="font-serif text-xl tracking-[0.25em] uppercase">SAPPHIRE</span>
+            {/* Top Bar */}
+            <div className="flex items-center justify-between border-b border-[#FAF8F5]/10 pb-5">
+              <span className="font-serif text-xl tracking-[0.25em] uppercase text-[#FAF8F5]">
+                SAPPHIRE
+              </span>
               <button
                 id="close-mobile-menu"
                 type="button"
                 onClick={() => setMobileMenuOpen(false)}
                 aria-label="Close menu"
-                className="p-2 -mr-2 text-[#0E0D0D] hover:opacity-60 transition-opacity"
+                className="p-2 text-[#FAF8F5] hover:opacity-50 transition-opacity"
               >
-                <X className="w-6 h-6" />
+                <X className="w-5 h-5 stroke-[1.5]" />
               </button>
             </div>
 
-            {/* Editorial Nav Items */}
-            <div className="flex flex-col space-y-6 my-auto">
-              <span className="text-[10px] tracking-[0.3em] uppercase text-[#0E0D0D]/40 font-sans">
+            {/* Nav Items */}
+            <div className="flex flex-col space-y-6 my-auto py-8">
+              <span className="text-[9px] tracking-[0.35em] uppercase text-[#D8CFBE]/60 font-sans">
                 Curated Navigation
               </span>
               {navLinks.map((item, idx) => (
@@ -184,57 +183,53 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setMobileMenuOpen(false);
                     onNavigateSection(item.target);
                   }}
-                  className="group flex items-center justify-between text-left py-2 border-b border-[#0E0D0D]/5 text-2xl sm:text-3xl font-serif text-[#0E0D0D] hover:translate-x-2 transition-transform duration-300"
+                  className="group flex items-center justify-between text-left py-3 border-b border-[#FAF8F5]/10 text-2xl font-serif text-[#FAF8F5]"
                 >
                   <div className="flex items-baseline gap-4">
-                    <span className="text-xs font-sans text-[#0E0D0D]/40 tracking-wider">
+                    <span className="text-[10px] font-sans text-[#D8CFBE]/60 tracking-widest">
                       0{idx + 1}
                     </span>
-                    <span>{item.name}</span>
+                    <span className="group-hover:translate-x-1 transition-transform duration-300">
+                      {item.name}
+                    </span>
                   </div>
-                  <ArrowUpRight className="w-5 h-5 text-[#0E0D0D]/30 group-hover:text-[#0E0D0D] transition-colors" />
+                  <ArrowUpRight className="w-4 h-4 text-[#FAF8F5]/40 group-hover:text-[#FAF8F5] transition-colors" />
                 </button>
               ))}
             </div>
 
-            {/* Bottom Details */}
-            <div className="border-t border-[#0E0D0D]/10 pt-6 flex flex-col sm:flex-row sm:items-center justify-between text-xs text-[#0E0D0D]/60 tracking-wider gap-4">
-              <div>
-                <p className="font-medium text-[#0E0D0D]">Independent Fashion Concept</p>
-                <p>Lahore · Karachi · Islamabad</p>
-              </div>
-              <div className="flex gap-6">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onOpenSearch();
-                  }}
-                  className="hover:text-[#0E0D0D]"
-                >
-                  Search
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onOpenWishlist();
-                  }}
-                  className="hover:text-[#0E0D0D]"
-                >
-                  Wishlist ({wishlistCount})
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMobileMenuOpen(false);
-                    onOpenCart();
-                  }}
-                  className="hover:text-[#0E0D0D]"
-                >
-                  Bag ({cartCount})
-                </button>
-              </div>
+            {/* Bottom Actions */}
+            <div className="border-t border-[#FAF8F5]/10 pt-5 flex items-center justify-between text-[11px] font-sans text-[#FAF8F5]/60 tracking-wider">
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenSearch();
+                }}
+                className="hover:text-[#FAF8F5]"
+              >
+                Search
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenWishlist();
+                }}
+                className="hover:text-[#FAF8F5]"
+              >
+                Wishlist ({wishlistCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  onOpenCart();
+                }}
+                className="hover:text-[#FAF8F5] text-[#FAF8F5] font-medium"
+              >
+                Bag ({cartCount})
+              </button>
             </div>
           </motion.div>
         )}

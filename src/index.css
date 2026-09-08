@@ -3,13 +3,14 @@
 @theme {
   --font-serif: 'Cormorant Garamond', Georgia, Cambria, serif;
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --color-ivory: #FAF9F5;
-  --color-ivory-light: #FDFCF9;
-  --color-warm-beige: #F3F0EA;
-  --color-sand: #E7E2D8;
-  --color-muted-stone: #8E8A82;
-  --color-charcoal: #232220;
-  --color-noir: #0E0D0D;
+  --color-ivory: #FAF8F5;
+  --color-ivory-warm: #F4F1EA;
+  --color-ivory-deep: #ECE7DE;
+  --color-sand: #DFD8CC;
+  --color-champagne: #D8CFBE;
+  --color-muted-grey: #8A857D;
+  --color-charcoal: #1E1D1C;
+  --color-noir: #0B0A0A;
 }
 
 @layer base {
@@ -17,18 +18,19 @@
     scroll-behavior: smooth;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
   
   body {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-    background-color: #FAF9F5;
-    color: #0E0D0D;
+    background-color: #0B0A0A;
+    color: #FAF8F5;
     overflow-x: hidden;
   }
 
   ::selection {
-    background-color: #0E0D0D;
-    color: #FAF9F5;
+    background-color: #FAF8F5;
+    color: #0B0A0A;
   }
 }
 
@@ -40,11 +42,20 @@
   font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-/* Luxury editorial image reveal and smooth hover */
-.img-editorial {
-  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+/* Hide scrollbar for gallery and drawers */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.img-editorial:hover {
-  transform: scale(1.025);
+/* Editorial subtle transition */
+.editorial-img-reveal {
+  transition: transform 1.6s cubic-bezier(0.16, 1, 0.3, 1), opacity 1.2s ease;
+}
+
+.editorial-img-reveal:hover {
+  transform: scale(1.02);
 }

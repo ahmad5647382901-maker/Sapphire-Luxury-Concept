@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
-import { NewEditionSection } from './components/NewEditionSection';
 import { CollectionEditorial } from './components/CollectionEditorial';
-import { ProductStorySection } from './components/ProductStorySection';
 import { CraftsmanshipSection } from './components/CraftsmanshipSection';
 import { ProductDetailSection } from './components/ProductDetailSection';
 import { DiscoverCTASection } from './components/DiscoverCTASection';
@@ -62,7 +60,7 @@ export default function App() {
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
-    setTimeout(() => setToastMessage(null), 3200);
+    setTimeout(() => setToastMessage(null), 3000);
   };
 
   const handleAddToCart = (quantity: number = 1) => {
@@ -123,7 +121,7 @@ export default function App() {
   const cartTotalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <div className="relative min-h-screen bg-[#FAF9F5] text-[#0E0D0D] flex flex-col font-sans selection:bg-[#0E0D0D] selection:text-[#FAF9F5]">
+    <div className="relative min-h-screen bg-[#0B0A0A] text-[#FAF8F5] flex flex-col font-sans selection:bg-[#FAF8F5] selection:text-[#0B0A0A]">
       {/* Top Navigation */}
       <Navbar
         cartCount={cartTotalItems}
@@ -134,37 +132,20 @@ export default function App() {
         onNavigateSection={scrollToSection}
       />
 
-      {/* Main Content Sections */}
+      {/* Main Content Editorial Chapters */}
       <main className="flex-1 w-full">
-        {/* HERO SECTION */}
+        {/* Chapter 01 — Campaign Opening */}
         <HeroSection
-          onExploreClick={() => scrollToSection('section-new-edition')}
+          onExploreClick={() => scrollToSection('section-collections')}
           onHeroProductClick={() => scrollToSection('section-product-detail')}
         />
 
-        {/* SECTION 1 — NEW EDITION */}
-        <NewEditionSection
-          onExplore={() => scrollToSection('section-collections')}
-        />
-
-        {/* SECTION 2 — COLLECTION */}
+        {/* Chapter 02 — Curated Series / Lookbook */}
         <CollectionEditorial
           onSelectStory={(storyId) => setActiveStoryId(storyId)}
         />
 
-        {/* SECTION 3 — PRODUCT STORY */}
-        <ProductStorySection
-          onGoToProduct={() => scrollToSection('section-product-detail')}
-          onQuickAdd={() => {
-            handleAddToCart(1);
-            setIsCartOpen(true);
-          }}
-        />
-
-        {/* SECTION 4 — DETAIL (Craftsmanship) */}
-        <CraftsmanshipSection />
-
-        {/* PRODUCT PAGE / DEDICATED PRODUCT EXPERIENCE */}
+        {/* Chapter 03 — The Central Object Study: NOIR STRUCTURE BAG */}
         <ProductDetailSection
           product={NOIR_STRUCTURE_BAG}
           isInWishlist={isInWishlist}
@@ -172,7 +153,10 @@ export default function App() {
           onAddToCart={handleAddToCart}
         />
 
-        {/* SECTION 5 — DISCOVER */}
+        {/* Chapter 04 — Atelier Craftsmanship Detail */}
+        <CraftsmanshipSection />
+
+        {/* Chapter 05 — The Epilogue & Atelier Dispatch */}
         <DiscoverCTASection
           onExploreCollection={() => scrollToSection('section-collections')}
           onAcquireBag={() => scrollToSection('section-product-detail')}
@@ -238,20 +222,20 @@ export default function App() {
           id="direct-zip-download-button"
           href="/sapphire-luxury-concept.zip"
           download="sapphire-luxury-concept.zip"
-          className="flex items-center gap-2.5 px-4 py-2.5 bg-[#0E0D0D] text-[#FAF9F5] text-xs font-sans tracking-widest uppercase shadow-2xl border border-[#FAF9F5]/30 hover:bg-[#232220] transition-all duration-300"
+          className="flex items-center gap-2 px-3.5 py-2 bg-[#141312] text-[#FAF8F5] text-[10px] font-sans tracking-[0.2em] uppercase shadow-2xl border border-[#FAF8F5]/20 hover:bg-[#232220] hover:border-[#D8CFBE]/60 transition-all"
           title="Download complete project source ZIP"
         >
-          <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-3 h-3 text-[#D8CFBE]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
           </svg>
-          <span>Export ZIP (11.5 MB)</span>
+          <span>Export ZIP</span>
         </a>
       </div>
 
       {/* Floating Micro-Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-5 py-3 bg-[#0E0D0D] text-[#FAF9F5] text-xs font-sans tracking-widest uppercase shadow-2xl border border-[#FAF9F5]/20 flex items-center gap-3">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#FAF9F5]" />
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 px-5 py-2.5 bg-[#141312] text-[#FAF8F5] text-[10px] font-sans tracking-[0.2em] uppercase shadow-2xl border border-[#FAF8F5]/20 flex items-center gap-2.5">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D8CFBE]" />
           <span>{toastMessage}</span>
         </div>
       )}
