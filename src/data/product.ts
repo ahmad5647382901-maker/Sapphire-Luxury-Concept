@@ -9,7 +9,14 @@ export const NOIR_STRUCTURE_BAG: Product = {
   formattedPrice: 'PKR 8,990',
   color: 'Noir Black',
   colorHex: '#141414',
-  description: 'A sculpted leather silhouette designed for effortless everyday elegance.',
+  description:
+    'A sculpted leather silhouette designed for effortless everyday elegance.',
+  category: 'Bags',
+  collection: 'Atelier Objects',
+  type: 'Structured Bag',
+  featured: true,
+  badge: 'Signature Edition',
+
   images: [
     {
       id: 'img-front',
@@ -17,13 +24,16 @@ export const NOIR_STRUCTURE_BAG: Product = {
       viewName: 'Front View',
       url: '/products/sapphire-bag/front.jpg',
       webpUrl: '/products/sapphire-bag/front.webp',
-      webpSrcSet: '/products/sapphire-bag/front-400.webp 400w, /products/sapphire-bag/front-600.webp 600w, /products/sapphire-bag/front.webp 896w',
+      webpSrcSet:
+        '/products/sapphire-bag/front-400.webp 400w, /products/sapphire-bag/front-600.webp 600w, /products/sapphire-bag/front.webp 896w',
       jpgSrcSet: '/products/sapphire-bag/front.jpg 896w',
       thumbnailUrl: '/products/sapphire-bag/front-thumb.jpg',
-      thumbnailWebpUrl: '/products/sapphire-bag/front-thumb.webp',
+      thumbnailWebpUrl:
+        '/products/sapphire-bag/front-thumb.webp',
       width: 896,
       height: 1200,
-      alt: 'NOIR STRUCTURE BAG — Sculpted front elevation showing clean architectural lines and brushed brass hardware',
+      alt:
+        'NOIR STRUCTURE BAG — Sculpted front elevation showing clean architectural lines and brushed brass hardware',
     },
     {
       id: 'img-side',
@@ -31,13 +41,16 @@ export const NOIR_STRUCTURE_BAG: Product = {
       viewName: 'Profile & Side',
       url: '/products/sapphire-bag/side.jpg',
       webpUrl: '/products/sapphire-bag/side.webp',
-      webpSrcSet: '/products/sapphire-bag/side-400.webp 400w, /products/sapphire-bag/side-600.webp 600w, /products/sapphire-bag/side.webp 896w',
+      webpSrcSet:
+        '/products/sapphire-bag/side-400.webp 400w, /products/sapphire-bag/side-600.webp 600w, /products/sapphire-bag/side.webp 896w',
       jpgSrcSet: '/products/sapphire-bag/side.jpg 896w',
       thumbnailUrl: '/products/sapphire-bag/side-thumb.jpg',
-      thumbnailWebpUrl: '/products/sapphire-bag/side-thumb.webp',
+      thumbnailWebpUrl:
+        '/products/sapphire-bag/side-thumb.webp',
       width: 896,
       height: 1200,
-      alt: 'NOIR STRUCTURE BAG — Geometric three-quarter side profile showcasing structured depth and handle curvature',
+      alt:
+        'NOIR STRUCTURE BAG — Geometric three-quarter side profile showcasing structured depth and handle curvature',
     },
     {
       id: 'img-back',
@@ -45,13 +58,16 @@ export const NOIR_STRUCTURE_BAG: Product = {
       viewName: 'Rear Panel',
       url: '/products/sapphire-bag/back.jpg',
       webpUrl: '/products/sapphire-bag/back.webp',
-      webpSrcSet: '/products/sapphire-bag/back-400.webp 400w, /products/sapphire-bag/back-600.webp 600w, /products/sapphire-bag/back.webp 896w',
+      webpSrcSet:
+        '/products/sapphire-bag/back-400.webp 400w, /products/sapphire-bag/back-600.webp 600w, /products/sapphire-bag/back.webp 896w',
       jpgSrcSet: '/products/sapphire-bag/back.jpg 896w',
       thumbnailUrl: '/products/sapphire-bag/back-thumb.jpg',
-      thumbnailWebpUrl: '/products/sapphire-bag/back-thumb.webp',
+      thumbnailWebpUrl:
+        '/products/sapphire-bag/back-thumb.webp',
       width: 896,
       height: 1200,
-      alt: 'NOIR STRUCTURE BAG — Rear leather panel with tailored tonal saddle stitching and seamless slip pocket',
+      alt:
+        'NOIR STRUCTURE BAG — Rear leather panel with tailored tonal saddle stitching and seamless slip pocket',
     },
     {
       id: 'img-detail',
@@ -59,15 +75,19 @@ export const NOIR_STRUCTURE_BAG: Product = {
       viewName: 'Craftsmanship Detail',
       url: '/products/sapphire-bag/detail.jpg',
       webpUrl: '/products/sapphire-bag/detail.webp',
-      webpSrcSet: '/products/sapphire-bag/detail-400.webp 400w, /products/sapphire-bag/detail-600.webp 600w, /products/sapphire-bag/detail.webp 896w',
+      webpSrcSet:
+        '/products/sapphire-bag/detail-400.webp 400w, /products/sapphire-bag/detail-600.webp 600w, /products/sapphire-bag/detail.webp 896w',
       jpgSrcSet: '/products/sapphire-bag/detail.jpg 896w',
       thumbnailUrl: '/products/sapphire-bag/detail-thumb.jpg',
-      thumbnailWebpUrl: '/products/sapphire-bag/detail-thumb.webp',
+      thumbnailWebpUrl:
+        '/products/sapphire-bag/detail-thumb.webp',
       width: 896,
       height: 1200,
-      alt: 'NOIR STRUCTURE BAG — Close-up macro texture of supple full-grain calfskin and edge-lacquered finishing',
+      alt:
+        'NOIR STRUCTURE BAG — Close-up macro texture of supple full-grain calfskin and edge-lacquered finishing',
     },
   ],
+
   details: [
     'Architectural trapezoidal silhouette with reinforced base structure',
     'Concealed double magnetic flap closure with engraved minimalist brass insignia',
@@ -77,20 +97,24 @@ export const NOIR_STRUCTURE_BAG: Product = {
     'Protective custom brass base studs for floor stability',
     'Debossed foil-stamped interior authenticity serial code',
   ],
+
   materials: [
     '100% Full-grain European calfskin leather, vegetable-tanned and drum-dyed',
     'Interior lined in plush Japanese micro-suede in warm sand tone',
     'Hardware: Custom forged solid brass with brushed satin champagne gold finish',
     'Thread: High-tensile bonded German nylon saddle thread',
   ],
+
   dimensions: {
     height: '22 cm / 8.6 in',
     width: '28 cm / 11.0 in (base) · 24 cm / 9.4 in (top)',
     depth: '11.5 cm / 4.5 in',
     strapDrop: '48 cm – 56 cm / 18.9 – 22.0 in (adjustable)',
   },
+
   shippingInfo:
     'Complimentary white-glove courier delivery across Pakistan within 2–4 business days. Securely encased in our signature rigid archive presentation box with dust protective pouch.',
+
   returnsInfo:
     'We offer 14-day complimentary returns and exchanges for unworn items in their original packaging with security tags intact.',
 };
@@ -101,39 +125,50 @@ export const EDITORIAL_COLLECTIONS: EditorialStory[] = [
     edition: 'EDITION I',
     title: 'THE ARCHITECTURAL SILHOUETTE',
     category: 'Couture Tailoring',
-    description: 'Precision cutting, sculpted waistlines, and pure proportions that celebrate contemporary Pakistani silhouettes.',
+    description:
+      'Precision cutting, sculpted waistlines, and pure proportions that celebrate contemporary Pakistani silhouettes.',
     image: '/editorial/edition.jpg',
     webpUrl: '/editorial/edition.webp',
-    webpSrcSet: '/editorial/edition-400.webp 400w, /editorial/edition-600.webp 600w, /editorial/edition.webp 896w',
-    jpgSrcSet: '/editorial/edition-600.jpg 600w, /editorial/edition.jpg 896w',
+    webpSrcSet:
+      '/editorial/edition-400.webp 400w, /editorial/edition-600.webp 600w, /editorial/edition.webp 896w',
+    jpgSrcSet:
+      '/editorial/edition-600.jpg 600w, /editorial/edition.jpg 896w',
     width: 896,
     height: 1200,
     year: '2026',
   },
+
   {
     id: 'col-02',
     edition: 'EDITION II',
     title: 'THE RAW SILK STUDIO',
     category: 'Artisanal Weaves',
-    description: 'Indigenous mulberry silks hand-reeled and woven into fluid, effortless garments designed for movement.',
+    description:
+      'Indigenous mulberry silks hand-reeled and woven into fluid, effortless garments designed for movement.',
     image: '/editorial/silk.jpg',
     webpUrl: '/editorial/silk.webp',
-    webpSrcSet: '/editorial/silk-400.webp 400w, /editorial/silk-600.webp 600w, /editorial/silk.webp 896w',
-    jpgSrcSet: '/editorial/silk-600.jpg 600w, /editorial/silk.jpg 896w',
+    webpSrcSet:
+      '/editorial/silk-400.webp 400w, /editorial/silk-600.webp 600w, /editorial/silk.webp 896w',
+    jpgSrcSet:
+      '/editorial/silk-600.jpg 600w, /editorial/silk.jpg 896w',
     width: 896,
     height: 1200,
     year: '2026',
   },
+
   {
     id: 'col-03',
     edition: 'EDITION III',
     title: 'ATELIER CRAFTSMANSHIP',
     category: 'Leather & Metalwork',
-    description: 'Meticulous hand-burnished leathers and custom forged metal hardware built to age with graceful character.',
+    description:
+      'Meticulous hand-burnished leathers and custom forged metal hardware built to age with graceful character.',
     image: '/editorial/craft.jpg',
     webpUrl: '/editorial/craft.webp',
-    webpSrcSet: '/editorial/craft-600.webp 600w, /editorial/craft-1000.webp 1000w, /editorial/craft.webp 1376w',
-    jpgSrcSet: '/editorial/craft-600.jpg 600w, /editorial/craft.jpg 1376w',
+    webpSrcSet:
+      '/editorial/craft-600.webp 600w, /editorial/craft-1000.webp 1000w, /editorial/craft.webp 1376w',
+    jpgSrcSet:
+      '/editorial/craft-600.jpg 600w, /editorial/craft.jpg 1376w',
     width: 1376,
     height: 768,
     year: '2026',
