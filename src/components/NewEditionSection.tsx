@@ -3,115 +3,126 @@ import { motion } from 'motion/react';
 import { ArrowUpRight } from 'lucide-react';
 
 interface NewEditionSectionProps {
-  onExplore: () => void;
+onExplore: () => void;
 }
 
-export const NewEditionSection: React.FC<NewEditionSectionProps> = ({ onExplore }) => {
-  return (
-    <section
-      id="section-new-edition"
-      className="relative py-28 md:py-44 px-6 sm:px-10 md:px-14 bg-[#FAF8F5] border-t border-[#0B0A0A]/10 overflow-hidden text-[#0B0A0A]"
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Editorial Chapter Header */}
-        <div className="flex items-center justify-between border-b border-[#0B0A0A]/10 pb-5 mb-14 md:mb-24">
-          <div className="flex items-center gap-4">
-            <span className="text-[10px] tracking-[0.35em] uppercase font-sans text-[#8A857D]">
-              Chapter 02
-            </span>
-            <span className="w-6 h-[1px] bg-[#0B0A0A]/20" />
-            <span className="text-[10px] tracking-[0.35em] uppercase font-sans text-[#0B0A0A]">
-              The New Edition
-            </span>
-          </div>
+export const NewEditionSection: React.FC<NewEditionSectionProps> = ({
+onExplore,
+}) => {
+return (
+<section
+id="section-new-edition"
+className="relative overflow-hidden border-t border-[#0B0A0A]/10 bg-[#FAF8F5] px-6 py-24 text-[#0B0A0A] sm:px-10 md:px-14 md:py-36"
+>
+<div className="mx-auto max-w-7xl">
+{/* Editorial chapter marker */}
+<div className="mb-16 flex items-center justify-between border-b border-[#0B0A0A]/10 pb-5 md:mb-24">
+<div className="flex items-center gap-4">
+<span className="text-[9px] tracking-[0.34em] uppercase font-sans text-[#8A857D]">
+Chapter 02
+</span>
 
-          <span className="text-[10px] tracking-[0.3em] uppercase font-sans text-[#8A857D] hidden sm:inline">
-            Limited Series · 2026 Archive
+        <span className="h-px w-6 bg-[#0B0A0A]/20" />
+
+        <span className="text-[9px] tracking-[0.34em] uppercase font-sans text-[#0B0A0A]">
+          Anthology
+        </span>
+      </div>
+
+      <span className="hidden text-[9px] tracking-[0.28em] uppercase font-sans text-[#8A857D] sm:inline">
+        Autumn / Winter 2026
+      </span>
+    </div>
+
+    {/* Editorial composition */}
+    <div className="grid grid-cols-1 items-start gap-14 lg:grid-cols-12 lg:gap-20">
+      {/* Narrative */}
+      <div className="lg:col-span-5 lg:sticky lg:top-32">
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{
+            duration: 1.1,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+        >
+          <span className="mb-4 block text-[9px] tracking-[0.38em] uppercase font-sans text-[#8A857D]">
+            Curated Series
+          </span>
+
+          <h2 className="font-serif text-5xl font-normal leading-[0.94] tracking-[-0.025em] text-[#0B0A0A] sm:text-6xl md:text-7xl lg:text-[78px]">
+            The Curated
+            <br />
+            <span className="font-light italic text-[#8A857D]">
+              Series.
+            </span>
+          </h2>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{
+            duration: 1.1,
+            delay: 0.15,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className="mt-10 max-w-md"
+        >
+          <p className="text-xs font-sans font-light leading-[1.8] text-[#1E1D1C]/75 sm:text-sm">
+            Rejecting transient fashion cycles in pursuit of sculpted
+            silhouettes, tactile textiles, and forms designed to endure.
+          </p>
+
+          <button
+            id="new-edition-explore-cta"
+            type="button"
+            onClick={onExplore}
+            className="group mt-8 inline-flex items-center gap-3 border-b border-[#0B0A0A]/70 pb-1.5 text-[10px] font-sans font-medium tracking-[0.24em] uppercase text-[#0B0A0A] transition-colors duration-300 hover:border-[#8A857D]"
+          >
+            <span>Explore Series</span>
+
+            <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </button>
+        </motion.div>
+      </div>
+
+      {/* Editorial image */}
+      <motion.div
+        initial={{ opacity: 0, y: 24 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true, margin: '-80px' }}
+        transition={{
+          duration: 1.25,
+          delay: 0.1,
+          ease: [0.16, 1, 0.3, 1],
+        }}
+        className="lg:col-span-7"
+      >
+        <div className="group relative aspect-[4/5] w-full overflow-hidden bg-[#ECE7DE]">
+          <img
+            src="/editorial/edition.jpg"
+            alt="SAPPHIRE editorial fashion campaign"
+            referrerPolicy="no-referrer"
+            className="h-full w-full object-cover object-center contrast-[1.03] transition-transform duration-[1400ms] ease-out group-hover:scale-[1.025]"
+          />
+        </div>
+
+        <div className="flex items-start justify-between gap-6 pt-4">
+          <span className="text-[8px] leading-relaxed tracking-[0.25em] uppercase font-sans text-[#8A857D] sm:text-[9px]">
+            Sculpted silhouettes · Tactile textiles
+          </span>
+
+          <span className="text-right text-[8px] leading-relaxed tracking-[0.25em] uppercase font-sans text-[#8A857D] sm:text-[9px]">
+            Edition 01
           </span>
         </div>
+      </motion.div>
+    </div>
+  </div>
+</section>
 
-        {/* Asymmetric Composition */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-start">
-          {/* Left Column: Oversized Typography & Narrow Narrative Column */}
-          <div className="lg:col-span-5 flex flex-col justify-between space-y-10 lg:sticky lg:top-32">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 1.1, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-4"
-            >
-              <span className="text-[9px] tracking-[0.4em] uppercase font-sans text-[#8A857D] block">
-                Autumn Winter Series
-              </span>
-              <h2 className="font-serif text-5xl sm:text-6xl md:text-7xl lg:text-[76px] leading-[0.94] tracking-tight font-normal text-[#0B0A0A]">
-                The New
-                <br />
-                <span className="italic font-light text-[#8A857D]">Edition.</span>
-              </h2>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 25 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: '-80px' }}
-              transition={{ duration: 1.1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-              className="space-y-6 max-w-md"
-            >
-              <p className="text-xs sm:text-sm font-sans font-light text-[#1E1D1C]/80 leading-relaxed">
-                Produced in strictly numbered quantities, this release fuses ancestral Pakistani
-                textile geometry with razor-sharp architectural tailoring. Each silhouette is
-                conceived to exist between quiet discipline and sculptural power.
-              </p>
-
-              <div className="pt-4 flex items-center gap-8">
-                <button
-                  id="new-edition-explore-cta"
-                  type="button"
-                  onClick={onExplore}
-                  className="group inline-flex items-center gap-2.5 text-[11px] tracking-[0.25em] uppercase font-sans font-medium text-[#0B0A0A] pb-1 border-b border-[#0B0A0A] hover:border-[#8A857D] transition-colors"
-                >
-                  <span>Explore Series</span>
-                  <ArrowUpRight className="w-3.5 h-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-                </button>
-
-                <span className="text-[9px] tracking-[0.25em] uppercase font-sans text-[#8A857D]">
-                  Edition of 50
-                </span>
-              </div>
-            </motion.div>
-          </div>
-
-          {/* Right Column: Full-Bleed Editorial Visual with Vertical Accent */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: '-80px' }}
-            transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
-            className="lg:col-span-7 relative"
-          >
-            <div className="relative aspect-[3/4] sm:aspect-[4/5] w-full overflow-hidden bg-[#ECE7DE]">
-              <img
-                src="/editorial/edition.jpg"
-                alt="SAPPHIRE The New Edition presentation — Sculpted tailoring in natural light"
-                referrerPolicy="no-referrer"
-                className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out hover:scale-105 filter contrast-[1.03]"
-              />
-
-              {/* Minimalist Corner Annotation */}
-              <div className="absolute bottom-6 left-6 text-[#FAF8F5] text-[9px] tracking-[0.3em] uppercase font-sans bg-black/40 backdrop-blur-xs px-3 py-1.5">
-                Plates 01–04 · Lahore Studio
-              </div>
-            </div>
-
-            {/* Asymmetric metadata note below image */}
-            <div className="flex justify-between items-baseline pt-4 text-[9px] tracking-[0.25em] uppercase font-sans text-[#8A857D]">
-              <span>Look 04 · Raw Silk & Wool Cashmere</span>
-              <span>Model Reference 26-B</span>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
+);
 };
