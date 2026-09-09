@@ -1,21 +1,74 @@
-// Keep your existing imports, component props, state, and product typing
-// above this section exactly as they are in your current file.
+import React, { useEffect, useRef, useState } from 'react';
+import {
+  AnimatePresence,
+  motion,
+} from 'framer-motion';
+import {
+  Check,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  Heart,
+  Maximize2,
+  Minus,
+  Plus,
+} from 'lucide-react';
 
-  // Desktop hover zoom state
+interface ProductDetailSectionProps {
+  product: any;
+  isInWishlist: boolean;
+  onToggleWishlist: () => void;
+  onAddToCart: (quantity?: number) => void;
+}
+
+export function ProductDetailSection({
+  product,
+  isInWishlist,
+  onToggleWishlist,
+  onAddToCart,
+}: ProductDetailSectionProps) {
+  const [selectedImageIndex, setSelectedImageIndex] =
+    useState(0);
+
+  const [quantity, setQuantity] = useState(1);
+  const [isAdding, setIsAdding] = useState(false);
+  const [addedSuccess, setAddedSuccess] = useState(false);
+  const [openAccordion, setOpenAccordion] =
+    useState<string | null>(null);
+
   const [isHovered, setIsHovered] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 50, y: 50 });
-  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const [mousePosition, setMousePosition] = useState({
+    x: 50,
+    y: 50,
+  });
 
-  // Mobile touch swipe
-  const touchStartXRef = useRef<number | null>(null);
-  const touchEndXRef = useRef<number | null>(null);
+  const imageContainerRef =
+    useRef<HTMLDivElement>(null);
 
-  const handleTouchStart = (e: React.TouchEvent) => {
-    touchStartXRef.current = e.targetTouches[0]?.clientX ?? null;
+  const touchStartXRef =
+    useRef<number | null>(null);
+
+  const touchEndXRef =
+    useRef<number | null>(null);
+
+  const addTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const successTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleTouchStart = (
+    e: React.TouchEvent
+  ) => {
+    touchStartXRef.current =
+      e.targetTouches[0]?.clientX ?? null;
   };
 
-  const handleTouchMove = (e: React.TouchEvent) => {
-    touchEndXRef.current = e.targetTouches[0]?.clientX ?? null;
+  const handleTouchMove = (
+    e: React.TouchEvent
+  ) => {
+    touchEndXRef.current =
+      e.targetTouches[0]?.clientX ?? null;
   };
 
   const handleTouchEnd = () => {
@@ -27,10 +80,14 @@
     }
 
     const distance =
-      touchStartXRef.current - touchEndXRef.current;
+      touchStartXRef.current -
+      touchEndXRef.current;
 
-    if (Math.abs(distance) > 40) {
-      setSelectedImageIndex((prev) =>
+    if (
+      Math.abs(distance) > 40 &&
+      product.images?.length > 0
+    ) {
+      setSelectedImageIndex((prev: number) =>
         distance > 0
           ? (prev + 1) % product.images.length
           : (prev - 1 + product.images.length) %
@@ -54,7 +111,9 @@
       0,
       Math.min(
         100,
-        ((e.clientX - rect.left) / rect.width) * 100
+        ((e.clientX - rect.left) /
+          rect.width) *
+          100
       )
     );
 
@@ -62,7 +121,9 @@
       0,
       Math.min(
         100,
-        ((e.clientY - rect.top) / rect.height) * 100
+        ((e.clientY - rect.top) /
+          rect.height) *
+          100
       )
     );
 
@@ -74,21 +135,36 @@
 
     setIsAdding(true);
 
-    window.setTimeout(() => {
+    if (addTimerRef.current) {
+      clearTimeout(addTimerRef.current);
+    }
+
+    if (successTimerRef.current) {
+      clearTimeout(successTimerRef.current);
+    }
+
+    addTimerRef.current = setTimeout(() => {
       onAddToCart(quantity);
       setIsAdding(false);
       setAddedSuccess(true);
 
-      window.setTimeout(() => {
+      successTimerRef.current = setTimeout(() => {
         setAddedSuccess(false);
+        successTimerRef.current = null;
       }, 2400);
+
+      addTimerRef.current = null;
     }, 350);
   };
 
-  const currentImage = product.images[selectedImageIndex];
+  const currentImage =
+    product.images?.[selectedImageIndex] ??
+    product.images?.[0];
 
-  const handleThumbnailHover = (idx: number) => {
-    const target = product.images[idx];
+  const handleThumbnailHover = (
+    idx: number
+  ) => {
+    const target = product.images?.[idx];
 
     if (
       target?.webpUrl &&
@@ -107,28 +183,39 @@
       return;
     }
 
-    const element = imageContainerRef.current;
+    const element =
+      imageContainerRef.current;
+
     if (!element) return;
 
-    let timeoutId: number | null = null;
+    let timeoutId:
+      ReturnType<typeof setTimeout> | null =
+      null;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (!entries[0]?.isIntersecting) return;
-
-        timeoutId = window.setTimeout(() => {
-          const nextImg = product.images[1];
-
-          if (nextImg?.webpUrl) {
-            const preloaded = new Image();
-            preloaded.src = nextImg.webpUrl;
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+          if (!entries[0]?.isIntersecting) {
+            return;
           }
-        }, 1500);
 
-        observer.disconnect();
-      },
-      { rootMargin: '150px' }
-    );
+          timeoutId = setTimeout(() => {
+            const nextImg =
+              product.images?.[1];
+
+            if (nextImg?.webpUrl) {
+              const preloaded =
+                new Image();
+
+              preloaded.src =
+                nextImg.webpUrl;
+            }
+          }, 1500);
+
+          observer.disconnect();
+        },
+        { rootMargin: '150px' }
+      );
 
     observer.observe(element);
 
@@ -136,12 +223,26 @@
       observer.disconnect();
 
       if (timeoutId !== null) {
-        window.clearTimeout(timeoutId);
+        clearTimeout(timeoutId);
       }
     };
   }, [product.images]);
 
-  const toggleAccordion = (id: string) => {
+  useEffect(() => {
+    return () => {
+      if (addTimerRef.current) {
+        clearTimeout(addTimerRef.current);
+      }
+
+      if (successTimerRef.current) {
+        clearTimeout(successTimerRef.current);
+      }
+    };
+  }, []);
+
+  const toggleAccordion = (
+    id: string
+  ) => {
     setOpenAccordion((prev) =>
       prev === id ? null : id
     );
@@ -151,51 +252,69 @@
     {
       name: 'Front Elevation',
       short: 'Front',
-      subtitle: 'Architectural Silhouette',
+      subtitle:
+        'Architectural Silhouette',
     },
     {
       name: 'Side Profile',
       short: 'Side',
-      subtitle: 'Tapered Geometric Gusset',
+      subtitle:
+        'Tapered Geometric Gusset',
     },
     {
       name: 'Rear Elevation',
       short: 'Back View',
-      subtitle: 'Flush Slip Pocket & Saddle Stitching',
+      subtitle:
+        'Flush Slip Pocket & Saddle Stitching',
     },
     {
       name: 'Atelier Detail',
       short: 'Craft Detail',
-      subtitle: 'Full-Grain Calfskin & Satin Brass',
+      subtitle:
+        'Material & Construction Detail',
     },
   ];
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      const container = imageContainerRef.current;
+    const handleKeyDown = (
+      e: KeyboardEvent
+    ) => {
+      const container =
+        imageContainerRef.current;
 
       if (!container) return;
 
       if (
         document.activeElement &&
-        container.contains(document.activeElement)
+        container.contains(
+          document.activeElement
+        )
       ) {
-        if (e.key === 'ArrowLeft') {
+        if (
+          e.key === 'ArrowLeft' &&
+          product.images?.length
+        ) {
           e.preventDefault();
 
           setSelectedImageIndex(
-            (prev) =>
-              (prev - 1 + product.images.length) %
+            (prev: number) =>
+              (prev -
+                1 +
+                product.images.length) %
               product.images.length
           );
         }
 
-        if (e.key === 'ArrowRight') {
+        if (
+          e.key === 'ArrowRight' &&
+          product.images?.length
+        ) {
           e.preventDefault();
 
           setSelectedImageIndex(
-            (prev) =>
-              (prev + 1) % product.images.length
+            (prev: number) =>
+              (prev + 1) %
+              product.images.length
           );
         }
       }
@@ -212,7 +331,11 @@
         handleKeyDown
       );
     };
-  }, [product.images.length]);
+  }, [product.images?.length]);
+
+  if (!currentImage) {
+    return null;
+  }
 
   return (
     <section
@@ -230,12 +353,12 @@
       />
 
       <div className="mx-auto max-w-7xl">
-
-        {/* Chapter Header */}
         <div className="mb-14 flex flex-col gap-4 border-b border-[#FAF8F5]/10 pb-6 text-[10px] font-sans uppercase tracking-[0.3em] text-[#D8CFBE]/60 sm:mb-20 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3">
             <span>Chapter 03</span>
-            <span className="text-[#FAF8F5]/30">·</span>
+            <span className="text-[#FAF8F5]/30">
+              ·
+            </span>
             <span className="text-[#FAF8F5]">
               The Masterwork Object
             </span>
@@ -246,20 +369,19 @@
           </span>
         </div>
 
-        {/* Product Composition */}
         <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-12 lg:gap-20">
-
-          {/* Gallery */}
           <div className="flex flex-col space-y-6 lg:col-span-7">
-
-            {/* Main Image */}
             <div
               ref={imageContainerRef}
               id="main-product-image-container"
               tabIndex={0}
               aria-label="Product image gallery stage. Use left and right arrow keys to switch perspectives."
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
+              onMouseEnter={() =>
+                setIsHovered(true)
+              }
+              onMouseLeave={() =>
+                setIsHovered(false)
+              }
               onMouseMove={handleMouseMove}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
@@ -274,7 +396,12 @@
                   exit={{ opacity: 0 }}
                   transition={{
                     duration: 0.4,
-                    ease: [0.16, 1, 0.3, 1],
+                    ease: [
+                      0.16,
+                      1,
+                      0.3,
+                      1,
+                    ],
                   }}
                   className="relative h-full w-full"
                 >
@@ -282,20 +409,26 @@
                     {currentImage.webpSrcSet ? (
                       <source
                         type="image/webp"
-                        srcSet={currentImage.webpSrcSet}
+                        srcSet={
+                          currentImage.webpSrcSet
+                        }
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 58vw, 680px"
                       />
                     ) : currentImage.webpUrl ? (
                       <source
                         type="image/webp"
-                        srcSet={currentImage.webpUrl}
+                        srcSet={
+                          currentImage.webpUrl
+                        }
                       />
                     ) : null}
 
                     {currentImage.jpgSrcSet ? (
                       <source
                         type="image/jpeg"
-                        srcSet={currentImage.jpgSrcSet}
+                        srcSet={
+                          currentImage.jpgSrcSet
+                        }
                         sizes="(max-width: 640px) 100vw, (max-width: 1024px) 58vw, 680px"
                       />
                     ) : null}
@@ -309,7 +442,8 @@
                       width={896}
                       height={1200}
                       loading={
-                        selectedImageIndex === 0
+                        selectedImageIndex ===
+                        0
                           ? 'eager'
                           : 'lazy'
                       }
@@ -329,12 +463,13 @@
                 </motion.div>
               </AnimatePresence>
 
-              {/* Perspective Label */}
               <div className="pointer-events-none absolute left-5 top-5 z-10 flex flex-col items-start gap-1">
                 <div className="border border-[#FAF8F5]/10 bg-[#0B0A0A]/80 px-3 py-1.5 text-[9px] font-sans uppercase tracking-[0.25em] text-[#FAF8F5] backdrop-blur-sm">
-                  {perspectiveTitles[
-                    selectedImageIndex
-                  ]?.name || currentImage.viewName}
+                  {
+                    perspectiveTitles[
+                      selectedImageIndex
+                    ]?.name
+                  }
                 </div>
 
                 <div className="px-1 text-[8px] font-sans tracking-[0.2em] text-[#FAF8F5]/45">
@@ -346,7 +481,6 @@
                 </div>
               </div>
 
-              {/* Gallery Arrows */}
               <div className="pointer-events-none absolute inset-x-0 top-1/2 z-10 flex -translate-y-1/2 items-center justify-between px-3">
                 <button
                   type="button"
@@ -354,7 +488,7 @@
                     e.stopPropagation();
 
                     setSelectedImageIndex(
-                      (prev) =>
+                      (prev: number) =>
                         (prev -
                           1 +
                           product.images.length) %
@@ -381,7 +515,7 @@
                     e.stopPropagation();
 
                     setSelectedImageIndex(
-                      (prev) =>
+                      (prev: number) =>
                         (prev + 1) %
                         product.images.length
                     );
@@ -399,85 +533,89 @@
                 </button>
               </div>
 
-              {/* Desktop Zoom Hint */}
               <div className="pointer-events-none absolute bottom-5 right-5 hidden items-center gap-2 border border-[#FAF8F5]/10 bg-[#0B0A0A]/75 px-3 py-1.5 text-[9px] font-sans uppercase tracking-[0.22em] text-[#FAF8F5]/55 backdrop-blur-sm md:flex">
                 <Maximize2 className="h-3 w-3 text-[#D8CFBE]" />
                 <span>Inspect detail</span>
               </div>
             </div>
 
-            {/* Perspective Selector */}
             <div className="grid grid-cols-4 gap-2 sm:gap-3">
-              {product.images.map((img, idx) => {
-                const isActive =
-                  selectedImageIndex === idx;
+              {product.images.map(
+                (img: any, idx: number) => {
+                  const isActive =
+                    selectedImageIndex === idx;
 
-                const perspective =
-                  perspectiveTitles[idx];
+                  const perspective =
+                    perspectiveTitles[idx] ??
+                    perspectiveTitles[0];
 
-                return (
-                  <button
-                    key={img.id}
-                    id={`gallery-perspective-${idx}`}
-                    type="button"
-                    onClick={() =>
-                      setSelectedImageIndex(idx)
-                    }
-                    onMouseEnter={() =>
-                      handleThumbnailHover(idx)
-                    }
-                    onFocus={() =>
-                      handleThumbnailHover(idx)
-                    }
-                    aria-label={`Switch to ${perspective.name}: ${perspective.subtitle}`}
-                    aria-pressed={isActive}
-                    className={`group flex cursor-pointer flex-col space-y-2 border-b pb-2 text-left transition-all duration-300 ${
-                      isActive
-                        ? 'border-[#D8CFBE] opacity-100'
-                        : 'border-transparent opacity-40 hover:opacity-80'
-                    }`}
-                  >
-                    <div className="aspect-[4/3] w-full overflow-hidden border border-[#FAF8F5]/10 bg-[#141312]">
-                      <picture className="block h-full w-full">
-                        {img.thumbnailWebpUrl && (
-                          <source
-                            type="image/webp"
-                            srcSet={`${img.thumbnailWebpUrl} 1x, ${img.webpUrl || img.url} 2x`}
+                  return (
+                    <button
+                      key={img.id}
+                      id={`gallery-perspective-${idx}`}
+                      type="button"
+                      onClick={() =>
+                        setSelectedImageIndex(
+                          idx
+                        )
+                      }
+                      onMouseEnter={() =>
+                        handleThumbnailHover(
+                          idx
+                        )
+                      }
+                      onFocus={() =>
+                        handleThumbnailHover(
+                          idx
+                        )
+                      }
+                      aria-label={`Switch to ${perspective.name}: ${perspective.subtitle}`}
+                      aria-pressed={isActive}
+                      className={`group flex cursor-pointer flex-col space-y-2 border-b pb-2 text-left transition-all duration-300 ${
+                        isActive
+                          ? 'border-[#D8CFBE] opacity-100'
+                          : 'border-transparent opacity-40 hover:opacity-80'
+                      }`}
+                    >
+                      <div className="aspect-[4/3] w-full overflow-hidden border border-[#FAF8F5]/10 bg-[#141312]">
+                        <picture className="block h-full w-full">
+                          {img.thumbnailWebpUrl && (
+                            <source
+                              type="image/webp"
+                              srcSet={`${img.thumbnailWebpUrl} 1x, ${img.webpUrl || img.url} 2x`}
+                            />
+                          )}
+
+                          <img
+                            src={
+                              img.thumbnailWebpUrl ||
+                              img.thumbnailUrl ||
+                              img.url
+                            }
+                            alt={img.alt}
+                            width={200}
+                            height={150}
+                            loading="lazy"
+                            decoding="async"
+                            className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
                           />
-                        )}
+                        </picture>
+                      </div>
 
-                        <img
-                          src={
-                            img.thumbnailWebpUrl ||
-                            img.thumbnailUrl ||
-                            img.url
-                          }
-                          alt={img.alt}
-                          width={200}
-                          height={150}
-                          loading="lazy"
-                          decoding="async"
-                          className="h-full w-full object-cover object-center transition-transform duration-700 group-hover:scale-[1.03]"
-                        />
-                      </picture>
-                    </div>
-
-                    <span className="text-[9px] font-sans font-medium uppercase tracking-[0.2em] text-[#FAF8F5] sm:text-[10px]">
-                      {perspective.short}
-                    </span>
-                  </button>
-                );
-              })}
+                      <span className="text-[9px] font-sans font-medium uppercase tracking-[0.2em] text-[#FAF8F5] sm:text-[10px]">
+                        {perspective.short}
+                      </span>
+                    </button>
+                  );
+                }
+              )}
             </div>
           </div>
 
-          {/* Product Information */}
           <div
             id="section-acquire"
             className="flex flex-col space-y-8 scroll-mt-24 lg:col-span-5"
           >
-
-            {/* Product Header */}
             <div className="space-y-3">
               <span className="block text-[9px] font-sans uppercase tracking-[0.35em] text-[#D8CFBE]">
                 Atelier Leather Collection
@@ -498,12 +636,10 @@
               </div>
             </div>
 
-            {/* Description */}
             <p className="border-l border-[#D8CFBE]/40 pl-4 text-xs font-sans font-light leading-[1.8] text-[#FAF8F5]/75 sm:text-sm">
               {product.description}
             </p>
 
-            {/* Colorway */}
             <div className="space-y-3 pt-1">
               <div className="flex items-center justify-between text-[10px] font-sans uppercase tracking-[0.25em]">
                 <span className="font-medium text-[#FAF8F5]">
@@ -527,7 +663,6 @@
               </div>
             </div>
 
-            {/* Quantity + Purchase */}
             <div className="space-y-4 pt-1">
               <div className="flex items-center gap-4">
                 <span className="text-[10px] font-sans font-medium uppercase tracking-[0.25em] text-[#FAF8F5]/70">
@@ -605,9 +740,15 @@
                     ) : isAdding ? (
                       <motion.div
                         key="adding"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        animate={{
+                          opacity: 1,
+                        }}
+                        exit={{
+                          opacity: 0,
+                        }}
                       >
                         <span>
                           Securing...
@@ -616,9 +757,15 @@
                     ) : (
                       <motion.div
                         key="default"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        initial={{
+                          opacity: 0,
+                        }}
+                        animate={{
+                          opacity: 1,
+                        }}
+                        exit={{
+                          opacity: 0,
+                        }}
                       >
                         <span>
                           Add to Bag
@@ -655,18 +802,18 @@
               </div>
             </div>
 
-            {/* Product Accordions */}
             <div className="divide-y divide-[#FAF8F5]/10 border-t border-[#FAF8F5]/10 pt-2">
-
-              {/* Details */}
               <div className="py-4">
                 <button
                   type="button"
                   onClick={() =>
-                    toggleAccordion('details')
+                    toggleAccordion(
+                      'details'
+                    )
                   }
                   aria-expanded={
-                    openAccordion === 'details'
+                    openAccordion ===
+                    'details'
                   }
                   className="flex min-h-11 w-full items-center justify-between text-left text-[10px] font-sans font-medium uppercase tracking-[0.25em] text-[#FAF8F5]"
                 >
@@ -685,7 +832,8 @@
                 </button>
 
                 <AnimatePresence>
-                  {openAccordion === 'details' && (
+                  {openAccordion ===
+                    'details' && (
                     <motion.div
                       initial={{
                         height: 0,
@@ -705,8 +853,11 @@
                       className="overflow-hidden"
                     >
                       <ul className="space-y-2 pt-3 text-xs font-sans font-light leading-relaxed text-[#FAF8F5]/65">
-                        {product.details.map(
-                          (item, idx) => (
+                        {product.details?.map(
+                          (
+                            item: string,
+                            idx: number
+                          ) => (
                             <li
                               key={idx}
                               className="flex gap-3"
@@ -724,15 +875,17 @@
                 </AnimatePresence>
               </div>
 
-              {/* Materials */}
               <div className="py-4">
                 <button
                   type="button"
                   onClick={() =>
-                    toggleAccordion('materials')
+                    toggleAccordion(
+                      'materials'
+                    )
                   }
                   aria-expanded={
-                    openAccordion === 'materials'
+                    openAccordion ===
+                    'materials'
                   }
                   className="flex min-h-11 w-full items-center justify-between text-left text-[10px] font-sans font-medium uppercase tracking-[0.25em] text-[#FAF8F5]"
                 >
@@ -772,8 +925,11 @@
                       className="overflow-hidden"
                     >
                       <ul className="space-y-2 pt-3 text-xs font-sans font-light leading-relaxed text-[#FAF8F5]/65">
-                        {product.materials.map(
-                          (mat, idx) => (
+                        {product.materials?.map(
+                          (
+                            mat: string,
+                            idx: number
+                          ) => (
                             <li
                               key={idx}
                               className="flex gap-3"
@@ -791,12 +947,13 @@
                 </AnimatePresence>
               </div>
 
-              {/* Dimensions */}
               <div className="py-4">
                 <button
                   type="button"
                   onClick={() =>
-                    toggleAccordion('dimensions')
+                    toggleAccordion(
+                      'dimensions'
+                    )
                   }
                   aria-expanded={
                     openAccordion ===
@@ -844,28 +1001,44 @@
                           <strong className="font-medium text-[#FAF8F5]">
                             Height:
                           </strong>{' '}
-                          {product.dimensions.height}
+                          {
+                            product
+                              .dimensions
+                              ?.height
+                          }
                         </p>
 
                         <p>
                           <strong className="font-medium text-[#FAF8F5]">
                             Width:
                           </strong>{' '}
-                          {product.dimensions.width}
+                          {
+                            product
+                              .dimensions
+                              ?.width
+                          }
                         </p>
 
                         <p>
                           <strong className="font-medium text-[#FAF8F5]">
                             Depth:
                           </strong>{' '}
-                          {product.dimensions.depth}
+                          {
+                            product
+                              .dimensions
+                              ?.depth
+                          }
                         </p>
 
                         <p>
                           <strong className="font-medium text-[#FAF8F5]">
                             Strap Drop:
                           </strong>{' '}
-                          {product.dimensions.strapDrop}
+                          {
+                            product
+                              .dimensions
+                              ?.strapDrop
+                          }
                         </p>
                       </div>
                     </motion.div>
@@ -873,15 +1046,17 @@
                 </AnimatePresence>
               </div>
 
-              {/* Shipping */}
               <div className="py-4">
                 <button
                   type="button"
                   onClick={() =>
-                    toggleAccordion('shipping')
+                    toggleAccordion(
+                      'shipping'
+                    )
                   }
                   aria-expanded={
-                    openAccordion === 'shipping'
+                    openAccordion ===
+                    'shipping'
                   }
                   className="flex min-h-11 w-full items-center justify-between text-left text-[10px] font-sans font-medium uppercase tracking-[0.25em] text-[#FAF8F5]"
                 >
@@ -921,22 +1096,26 @@
                       className="overflow-hidden"
                     >
                       <p className="pt-3 text-xs font-sans font-light leading-relaxed text-[#FAF8F5]/65">
-                        {product.shippingInfo}
+                        {
+                          product.shippingInfo
+                        }
                       </p>
                     </motion.div>
                   )}
                 </AnimatePresence>
               </div>
 
-              {/* Returns */}
               <div className="py-4">
                 <button
                   type="button"
                   onClick={() =>
-                    toggleAccordion('returns')
+                    toggleAccordion(
+                      'returns'
+                    )
                   }
                   aria-expanded={
-                    openAccordion === 'returns'
+                    openAccordion ===
+                    'returns'
                   }
                   className="flex min-h-11 w-full items-center justify-between text-left text-[10px] font-sans font-medium uppercase tracking-[0.25em] text-[#FAF8F5]"
                 >
@@ -976,7 +1155,9 @@
                       className="overflow-hidden"
                     >
                       <p className="pt-3 text-xs font-sans font-light leading-relaxed text-[#FAF8F5]/65">
-                        {product.returnsInfo}
+                        {
+                          product.returnsInfo
+                        }
                       </p>
                     </motion.div>
                   )}
@@ -988,3 +1169,4 @@
       </div>
     </section>
   );
+      }
