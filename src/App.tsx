@@ -12,15 +12,20 @@ import { WishlistDrawer } from './components/WishlistDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { StoryModal } from './components/StoryModal';
 import { NOIR_STRUCTURE_BAG } from './data/product';
-import { CartItem } from './types';
+import { CartItem, Product } from './types';
 
 const CART_STORAGE_KEY = 'sapphire_bag_cart';
 const WISHLIST_STORAGE_KEY = 'sapphire_bag_wishlist';
+
+const PRODUCTS: Product[] = [
+  NOIR_STRUCTURE_BAG,
+];
 
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>(() => {
     try {
       const saved = localStorage.getItem(CART_STORAGE_KEY);
+
       if (!saved) return [];
 
       const parsed = JSON.parse(saved);
@@ -34,6 +39,7 @@ export default function App() {
           item.product &&
           typeof item.product.id === 'string' &&
           typeof item.quantity === 'number' &&
+          Number.isFinite(item.quantity) &&
           item.quantity > 0
       );
     } catch {
@@ -49,31 +55,54 @@ export default function App() {
     }
   });
 
+  const [selectedProduct, setSelectedProduct] =
+    useState<Product>(NOIR_STRUCTURE_BAG);
+
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-  const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
-  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
-  const toastTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [activeStoryId, setActiveStoryId] =
+    useState<string | null>(null);
 
+  const [toastMessage, setToastMessage] =
+    useState<string | null>(null);
+
+  const toastTimerRef =
+    useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  /*
+   * Persist cart
+   */
   useEffect(() => {
     try {
-      localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cart));
+      localStorage.setItem(
+        CART_STORAGE_KEY,
+        JSON.stringify(cart)
+      );
     } catch (error) {
       console.error('Unable to save cart:', error);
     }
   }, [cart]);
 
+  /*
+   * Persist wishlist
+   */
   useEffect(() => {
     try {
-      localStorage.setItem(WISHLIST_STORAGE_KEY, String(isInWishlist));
+      localStorage.setItem(
+        WISHLIST_STORAGE_KEY,
+        String(isInWishlist)
+      );
     } catch (error) {
       console.error('Unable to save wishlist:', error);
     }
   }, [isInWishlist]);
 
+  /*
+   * Cleanup toast timer
+   */
   useEffect(() => {
     return () => {
       if (toastTimerRef.current) {
@@ -82,6 +111,9 @@ export default function App() {
     };
   }, []);
 
+  /*
+   * Toast helper
+   */
   const showToast = (message: string) => {
     if (toastTimerRef.current) {
       clearTimeout(toastTimerRef.current);
@@ -95,18 +127,61 @@ export default function App() {
     }, 3000);
   };
 
-  const handleAddToCart = (quantity: number = 1) => {
-    const safeQuantity = Math.max(1, Math.floor(quantity));
+  /*
+   * Find product by ID
+   *
+   * This will become the central product lookup
+   * once the full catalog is added.
+   */
+  const getProductById = (productId: string) => {
+    return PRODUCTS.find(
+      (product) => product.id === productId
+    );
+  };
+
+  /*
+   * Select product
+   */
+  const handleSelectProduct = (product: Product) => {
+    setSelectedProduct(product);
+
+    requestAnimationFrame(() => {
+      const element = document.getElementById(
+        'section-product-detail'
+      );
+
+      element?.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    });
+  };
+
+  /*
+   * Add product to cart
+   */
+  const handleAddProductToCart = (
+    product: Product,
+    quantity: number = 1
+  ) => {
+    const safeQuantity = Math.max(
+      1,
+      Math.floor(quantity)
+    );
 
     setCart((prev) => {
       const existing = prev.find(
-        (item) => item.product.id === NOIR_STRUCTURE_BAG.id
+        (item) => item.product.id === product.id
       );
 
       if (existing) {
         return prev.map((item) =>
-          item.product.id === NOIR_STRUCTURE_BAG.id
-            ? { ...item, quantity: item.quantity + safeQuantity }
+          item.product.id === product.id
+            ? {
+                ...item,
+                quantity:
+                  item.quantity + safeQuantity,
+              }
             : item
         );
       }
@@ -114,19 +189,37 @@ export default function App() {
       return [
         ...prev,
         {
-          product: NOIR_STRUCTURE_BAG,
+          product,
           quantity: safeQuantity,
-          selectedColor: NOIR_STRUCTURE_BAG.color,
+          selectedColor: product.color,
         },
       ];
     });
 
     showToast(
-      `${safeQuantity} × ${NOIR_STRUCTURE_BAG.name} added to your bag`
+      `${safeQuantity} × ${product.name} added to your bag`
     );
   };
 
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
+  /*
+   * Current product add-to-cart handler
+   *
+   * Kept compatible with ProductDetailSection.
+   */
+  const handleAddToCart = (quantity: number = 1) => {
+    handleAddProductToCart(
+      selectedProduct,
+      quantity
+    );
+  };
+
+  /*
+   * Update cart quantity
+   */
+  const handleUpdateQuantity = (
+    productId: string,
+    quantity: number
+  ) => {
     const safeQuantity = Math.floor(quantity);
 
     if (safeQuantity <= 0) {
@@ -137,48 +230,77 @@ export default function App() {
     setCart((prev) =>
       prev.map((item) =>
         item.product.id === productId
-          ? { ...item, quantity: safeQuantity }
+          ? {
+              ...item,
+              quantity: safeQuantity,
+            }
           : item
       )
     );
   };
 
-  const handleRemoveFromCart = (productId: string) => {
+  /*
+   * Remove cart item
+   */
+  const handleRemoveFromCart = (
+    productId: string
+  ) => {
     setCart((prev) =>
-      prev.filter((item) => item.product.id !== productId)
+      prev.filter(
+        (item) => item.product.id !== productId
+      )
     );
 
     showToast('Item removed from bag');
   };
 
+  /*
+   * Wishlist
+   *
+   * Existing UI currently supports the hero product.
+   * The state is kept compatible while the catalog
+   * architecture is expanded.
+   */
   const handleToggleWishlist = () => {
     setIsInWishlist((prev) => {
       const next = !prev;
 
       showToast(
-        next ? 'Saved to wishlist' : 'Removed from wishlist'
+        next
+          ? 'Saved to wishlist'
+          : 'Removed from wishlist'
       );
 
       return next;
     });
   };
 
+  /*
+   * Scroll helper
+   */
   const scrollToSection = (sectionId: string) => {
-    const element = document.getElementById(sectionId);
+    const element =
+      document.getElementById(sectionId);
 
-    if (element) {
-      element.scrollIntoView({
-        behavior: 'smooth',
-        block: 'start',
-      });
-    }
+    if (!element) return;
+
+    element.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    });
   };
 
+  /*
+   * Cart totals
+   */
   const cartTotalItems = cart.reduce(
     (sum, item) => sum + item.quantity,
     0
   );
 
+  /*
+   * Checkout
+   */
   const handleOpenCheckout = () => {
     if (cart.length === 0) {
       showToast('Your bag is empty');
@@ -189,76 +311,159 @@ export default function App() {
     setIsCheckoutOpen(true);
   };
 
+  /*
+   * Search product selection
+   *
+   * SearchModal currently selects the existing
+   * product flow. This handler also keeps the
+   * selected product architecture ready for
+   * the expanded search system.
+   */
+  const handleSearchProduct = () => {
+    setIsSearchOpen(false);
+
+    handleSelectProduct(
+      selectedProduct || NOIR_STRUCTURE_BAG
+    );
+  };
+
+  /*
+   * Story navigation
+   */
+  const handleGoToProduct = () => {
+    setActiveStoryId(null);
+    handleSelectProduct(
+      NOIR_STRUCTURE_BAG
+    );
+  };
+
   return (
     <div className="relative min-h-screen bg-[#0B0A0A] text-[#FAF8F5] flex flex-col font-sans selection:bg-[#FAF8F5] selection:text-[#0B0A0A]">
       <Navbar
         cartCount={cartTotalItems}
         wishlistCount={isInWishlist ? 1 : 0}
-        onOpenCart={() => setIsCartOpen(true)}
-        onOpenSearch={() => setIsSearchOpen(true)}
-        onOpenWishlist={() => setIsWishlistOpen(true)}
-        onNavigateSection={scrollToSection}
+        onOpenCart={() =>
+          setIsCartOpen(true)
+        }
+        onOpenSearch={() =>
+          setIsSearchOpen(true)
+        }
+        onOpenWishlist={() =>
+          setIsWishlistOpen(true)
+        }
+        onNavigateSection={
+          scrollToSection
+        }
       />
 
       <main className="flex-1 w-full">
         <HeroSection
-          onExploreClick={() => scrollToSection('section-collections')}
-          onHeroProductClick={() =>
-            scrollToSection('section-product-detail')
+          onExploreClick={() =>
+            scrollToSection(
+              'section-collections'
+            )
           }
+          onHeroProductClick={() => {
+            setSelectedProduct(
+              NOIR_STRUCTURE_BAG
+            );
+
+            scrollToSection(
+              'section-product-detail'
+            );
+          }}
         />
 
         <CollectionEditorial
-          onSelectStory={(storyId) => setActiveStoryId(storyId)}
+          onSelectStory={(storyId) =>
+            setActiveStoryId(storyId)
+          }
         />
 
         <ProductDetailSection
-          product={NOIR_STRUCTURE_BAG}
+          product={selectedProduct}
           isInWishlist={isInWishlist}
-          onToggleWishlist={handleToggleWishlist}
-          onAddToCart={handleAddToCart}
+          onToggleWishlist={
+            handleToggleWishlist
+          }
+          onAddToCart={
+            handleAddToCart
+          }
         />
 
         <CraftsmanshipSection />
 
         <DiscoverCTASection
           onExploreCollection={() =>
-            scrollToSection('section-collections')
+            scrollToSection(
+              'section-collections'
+            )
           }
-          onAcquireBag={() =>
-            scrollToSection('section-product-detail')
-          }
+          onAcquireBag={() => {
+            setSelectedProduct(
+              NOIR_STRUCTURE_BAG
+            );
+
+            scrollToSection(
+              'section-product-detail'
+            );
+          }}
         />
       </main>
 
-      <Footer onNavigateSection={scrollToSection} />
+      <Footer
+        onNavigateSection={
+          scrollToSection
+        }
+      />
 
       <CartDrawer
         isOpen={isCartOpen}
         items={cart}
-        onClose={() => setIsCartOpen(false)}
-        onUpdateQuantity={handleUpdateQuantity}
-        onRemoveItem={handleRemoveFromCart}
-        onGoToCheckout={handleOpenCheckout}
+        onClose={() =>
+          setIsCartOpen(false)
+        }
+        onUpdateQuantity={
+          handleUpdateQuantity
+        }
+        onRemoveItem={
+          handleRemoveFromCart
+        }
+        onGoToCheckout={
+          handleOpenCheckout
+        }
       />
 
       <SearchModal
         isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectProduct={() => {
-          setIsSearchOpen(false);
-          scrollToSection('section-product-detail');
-        }}
+        onClose={() =>
+          setIsSearchOpen(false)
+        }
+        onSelectProduct={
+          handleSearchProduct
+        }
       />
 
       <WishlistDrawer
         isOpen={isWishlistOpen}
-        isInWishlist={isInWishlist}
-        product={NOIR_STRUCTURE_BAG}
-        onClose={() => setIsWishlistOpen(false)}
-        onToggleWishlist={handleToggleWishlist}
+        isInWishlist={
+          isInWishlist
+        }
+        product={
+          selectedProduct
+        }
+        onClose={() =>
+          setIsWishlistOpen(false)
+        }
+        onToggleWishlist={
+          handleToggleWishlist
+        }
         onAddToCart={() => {
-          handleAddToCart(1);
+          handleAddProductToCart(
+            selectedProduct,
+            1
+          );
+
           setIsWishlistOpen(false);
           setIsCartOpen(true);
         }}
@@ -267,7 +472,9 @@ export default function App() {
       <CheckoutModal
         isOpen={isCheckoutOpen}
         items={cart}
-        onClose={() => setIsCheckoutOpen(false)}
+        onClose={() =>
+          setIsCheckoutOpen(false)
+        }
         onOrderComplete={() => {
           setCart([]);
           setIsCheckoutOpen(false);
@@ -276,11 +483,12 @@ export default function App() {
 
       <StoryModal
         storyId={activeStoryId}
-        onClose={() => setActiveStoryId(null)}
-        onGoToBag={() => {
-          setActiveStoryId(null);
-          scrollToSection('section-product-detail');
-        }}
+        onClose={() =>
+          setActiveStoryId(null)
+        }
+        onGoToBag={
+          handleGoToProduct
+        }
       />
 
       {toastMessage && (
@@ -293,9 +501,12 @@ export default function App() {
             aria-hidden="true"
             className="w-1.5 h-1.5 rounded-full bg-[#D8CFBE] shrink-0"
           />
-          <span>{toastMessage}</span>
+
+          <span>
+            {toastMessage}
+          </span>
         </div>
       )}
     </div>
   );
-}
+    }
