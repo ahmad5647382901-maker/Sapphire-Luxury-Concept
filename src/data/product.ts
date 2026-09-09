@@ -153,7 +153,7 @@ export const SILK_FORM_SCARF: Product = {
     'Returns accepted according to the SAPPHIRE concept return policy.',
 };
 
-export const ARCHITECT TOTE: Product = {
+export const ARCHITECT_TOTE: Product = {
   id: 'architect-tote',
   name: 'ARCHITECT TOTE',
   tagline: 'Volume, proportion, restraint.',
@@ -209,7 +209,7 @@ export const ARCHITECT TOTE: Product = {
     'Returns accepted according to the SAPPHIRE concept return policy.',
 };
 
-export const ATELIER METAL CUFF: Product = {
+export const ATELIER_METAL_CUFF: Product = {
   id: 'atelier-metal-cuff',
   name: 'ATELIER METAL CUFF',
   tagline: 'Quiet hardware. Sculptural presence.',
