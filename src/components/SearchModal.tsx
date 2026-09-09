@@ -1,34 +1,47 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { AnimatePresence, motion } from 'motion/react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowUpRight, Search, X } from 'lucide-react';
-import {
-  NOIR_STRUCTURE_BAG,
-  EDITORIAL_COLLECTIONS,
-} from '../data/product';
-import { Product } from '../types';
+import { Product, EditorialStory } from '../types';
+import { NOIR_STRUCTURE_BAG, EDITORIAL_COLLECTIONS } from '../data/product';
 
 interface SearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelectProduct: (product: Product) => void;
-  onSelectStory?: (storyId: string) => void;
   products?: Product[];
+  stories?: EditorialStory[];
+  onSelectProduct: (product: Product) => void;
+  onSelectStory?: (story: EditorialStory) => void;
 }
 
 const SearchModal: React.FC<SearchModalProps> = ({
   isOpen,
   onClose,
+  products = [NOIR_STRUCTURE_BAG],
+  stories = EDITORIAL_COLLECTIONS,
   onSelectProduct,
   onSelectStory,
-  products = [NOIR_STRUCTURE_BAG],
 }) => {
   const [query, setQuery] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    const timer = window.setTimeout(() => {
+      inputRef.current?.focus();
+    }, 100);
+
+    return () => window.clearTimeout(timer);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) {
       setQuery('');
-      return;
     }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) return;
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
@@ -37,35 +50,25 @@ const SearchModal: React.FC<SearchModalProps> = ({
     };
 
     window.addEventListener('keydown', handleKeyDown);
-    document.body.style.overflow = 'hidden';
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
-    };
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [isOpen, onClose]);
 
-  /*
-   * Keep only one copy of each product.
-   * Product ID is the canonical unique identifier.
-   */
   const uniqueProducts = useMemo(() => {
-    const seen = new Set<string>();
+    const map = new Map<string, Product>();
 
-    return products.filter((product) => {
-      if (!product?.id || seen.has(product.id)) {
-        return false;
+    products.forEach((product) => {
+      if (product?.id) {
+        map.set(product.id, product);
       }
-
-      seen.add(product.id);
-      return true;
     });
+
+    return Array.from(map.values());
   }, [products]);
 
-  const trimmedQuery = query.trim().toLowerCase();
+  const normalizedQuery = query.trim().toLowerCase();
 
-  const productMatches = useMemo(() => {
-    if (!trimmedQuery) return [];
+  const filteredProducts = useMemo(() => {
+    if (!normalizedQuery) return uniqueProducts;
 
     return uniqueProducts.filter((product) => {
       const searchableText = [
@@ -86,14 +89,14 @@ const SearchModal: React.FC<SearchModalProps> = ({
         .join(' ')
         .toLowerCase();
 
-      return searchableText.includes(trimmedQuery);
+      return searchableText.includes(normalizedQuery);
     });
-  }, [uniqueProducts, trimmedQuery]);
+  }, [normalizedQuery, uniqueProducts]);
 
-  const storyMatches = useMemo(() => {
-    if (!trimmedQuery) return [];
+  const filteredStories = useMemo(() => {
+    if (!normalizedQuery) return stories;
 
-    return EDITORIAL_COLLECTIONS.filter((story) => {
+    return stories.filter((story) => {
       const searchableText = [
         story.title,
         story.subtitle,
@@ -107,350 +110,363 @@ const SearchModal: React.FC<SearchModalProps> = ({
         .join(' ')
         .toLowerCase();
 
-      return searchableText.includes(trimmedQuery);
+      return searchableText.includes(normalizedQuery);
     });
-  }, [trimmedQuery]);
+  }, [normalizedQuery, stories]);
 
-  const featuredProducts = useMemo(
-    () => uniqueProducts.filter((product) => product.featured),
-    [uniqueProducts]
-  );
+  const featuredProducts = uniqueProducts.slice(0, 4);
 
   const handleProductSelect = (product: Product) => {
     onClose();
     onSelectProduct(product);
   };
 
-  const handleStorySelect = (storyId: string) => {
+  const handleStorySelect = (story: EditorialStory) => {
     onClose();
-    onSelectStory?.(storyId);
+    onSelectStory?.(story);
   };
-
-  const displayedProducts = trimmedQuery
-    ? productMatches
-    : featuredProducts;
-
-  const hasResults =
-    productMatches.length > 0 || storyMatches.length > 0;
 
   return (
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-[100] flex items-start justify-center bg-black/60 px-4 pt-6 backdrop-blur-md sm:pt-10"
+          className="fixed inset-0 z-[100] bg-[#11110f]/95 text-[#f3eee5]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.25 }}
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) {
-              onClose();
-            }
-          }}
         >
           <motion.div
-            className="relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden border border-black/10 bg-[#f3f0e9] shadow-2xl"
-            initial={{ opacity: 0, y: 30, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: 20, scale: 0.98 }}
-            transition={{
-              duration: 0.35,
-              ease: [0.22, 1, 0.36, 1],
-            }}
+            className="absolute inset-0 overflow-y-auto"
+            initial={{ y: 20 }}
+            animate={{ y: 0 }}
+            exit={{ y: 10 }}
+            transition={{ duration: 0.3 }}
           >
-            {/* Header */}
-            <div className="flex items-center justify-between border-b border-black/10 px-5 py-5 sm:px-8">
-              <div>
-                <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-black/45">
-                  SAPPHIRE
-                </p>
-                <h2 className="mt-1 font-serif text-2xl tracking-[-0.02em] text-black sm:text-3xl">
-                  Search the Collection
-                </h2>
-              </div>
+            <div className="mx-auto min-h-screen w-full max-w-[1400px] px-5 py-6 sm:px-8 lg:px-12">
+              <header className="flex items-center justify-between border-b border-white/10 pb-5">
+                <div>
+                  <p className="text-[10px] uppercase tracking-[0.35em] text-white/40">
+                    SAPPHIRE
+                  </p>
+                  <p className="mt-1 font-serif text-2xl">
+                    Search the collection
+                  </p>
+                </div>
 
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label="Close search"
-                className="flex h-10 w-10 items-center justify-center border border-black/10 text-black/60 transition-colors hover:bg-black hover:text-white"
-              >
-                <X size={18} strokeWidth={1.5} />
-              </button>
-            </div>
+                <button
+                  type="button"
+                  onClick={onClose}
+                  aria-label="Close search"
+                  className="flex h-11 w-11 items-center justify-center border border-white/10 transition hover:bg-white/10"
+                >
+                  <X size={18} strokeWidth={1.5} />
+                </button>
+              </header>
 
-            {/* Search field */}
-            <div className="border-b border-black/10 px-5 py-5 sm:px-8">
-              <div className="flex items-center gap-4 border-b border-black/25 pb-3">
-                <Search
-                  size={20}
-                  strokeWidth={1.4}
-                  className="shrink-0 text-black/45"
-                />
+              <div className="mx-auto mt-10 max-w-4xl">
+                <div className="flex items-center border-b border-white/25 pb-4">
+                  <Search
+                    size={22}
+                    strokeWidth={1.3}
+                    className="mr-4 shrink-0 text-white/50"
+                  />
 
-                <input
-                  autoFocus
-                  value={query}
-                  onChange={(event) => setQuery(event.target.value)}
-                  placeholder="Search products, collections, materials..."
-                  className="w-full bg-transparent font-sans text-sm tracking-wide text-black outline-none placeholder:text-black/35"
-                />
+                  <input
+                    ref={inputRef}
+                    type="text"
+                    value={query}
+                    onChange={(event) => setQuery(event.target.value)}
+                    placeholder="Search products, collections, materials..."
+                    className="w-full bg-transparent font-serif text-2xl outline-none placeholder:text-white/25 sm:text-4xl"
+                    autoComplete="off"
+                  />
 
-                {query && (
-                  <button
-                    type="button"
-                    onClick={() => setQuery('')}
-                    className="shrink-0 text-black/40 transition-colors hover:text-black"
-                    aria-label="Clear search"
-                  >
-                    <X size={16} />
-                  </button>
-                )}
-              </div>
-            </div>
-
-            {/* Results */}
-            <div className="min-h-0 flex-1 overflow-y-auto px-5 py-6 sm:px-8 sm:py-8">
-              {!trimmedQuery ? (
-                <>
-                  <div className="mb-6 flex items-end justify-between">
-                    <div>
-                      <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-black/40">
-                        Curated Objects
-                      </p>
-                      <h3 className="mt-2 font-serif text-2xl text-black">
-                        Featured Pieces
-                      </h3>
-                    </div>
-
-                    <span className="font-sans text-[10px] uppercase tracking-[0.2em] text-black/40">
-                      {String(featuredProducts.length).padStart(2, '0')} Objects
-                    </span>
-                  </div>
-
-                  {featuredProducts.length > 0 ? (
-                    <div className="grid grid-cols-1 gap-px bg-black/10 sm:grid-cols-2 lg:grid-cols-3">
-                      {featuredProducts.map((product) => (
-                        <button
-                          type="button"
-                          key={product.id}
-                          onClick={() => handleProductSelect(product)}
-                          className="group bg-[#f3f0e9] text-left"
-                        >
-                          <div className="relative aspect-[4/5] overflow-hidden bg-[#e8e3da]">
-                            <img
-                              src={
-                                product.images[0]?.webpUrl ||
-                                product.images[0]?.url
-                              }
-                              alt={product.images[0]?.alt || product.name}
-                              className="h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-                            />
-
-                            {product.badge && (
-                              <span className="absolute left-4 top-4 bg-[#f3f0e9] px-3 py-1.5 font-sans text-[9px] uppercase tracking-[0.18em] text-black/65">
-                                {product.badge}
-                              </span>
-                            )}
-
-                            <div className="absolute bottom-4 right-4 flex h-9 w-9 items-center justify-center bg-[#f3f0e9] opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                              <ArrowUpRight
-                                size={15}
-                                strokeWidth={1.4}
-                              />
-                            </div>
-                          </div>
-
-                          <div className="px-4 py-4">
-                            <p className="font-sans text-[9px] uppercase tracking-[0.22em] text-black/40">
-                              {product.category}
-                            </p>
-
-                            <div className="mt-2 flex items-start justify-between gap-4">
-                              <h4 className="font-serif text-lg leading-tight text-black">
-                                {product.name}
-                              </h4>
-
-                              <span className="whitespace-nowrap font-sans text-[10px] tracking-wide text-black/55">
-                                {product.formattedPrice}
-                              </span>
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="border border-black/10 py-16 text-center">
-                      <p className="font-serif text-xl text-black/60">
-                        No featured objects yet.
-                      </p>
-                    </div>
+                  {query && (
+                    <button
+                      type="button"
+                      onClick={() => setQuery('')}
+                      className="ml-3 text-white/40 transition hover:text-white"
+                      aria-label="Clear search"
+                    >
+                      <X size={18} />
+                    </button>
                   )}
-                </>
-              ) : (
-                <>
-                  <div className="mb-7">
-                    <p className="font-sans text-[10px] uppercase tracking-[0.28em] text-black/40">
-                      Search Results
-                    </p>
-                    <h3 className="mt-2 font-serif text-2xl text-black">
-                      Results for “{query.trim()}”
-                    </h3>
-                  </div>
+                </div>
 
-                  {!hasResults ? (
-                    <div className="border border-black/10 py-20 text-center">
-                      <Search
-                        size={26}
-                        strokeWidth={1}
-                        className="mx-auto text-black/30"
-                      />
+                <div className="mt-3 flex items-center justify-between text-[10px] uppercase tracking-[0.25em] text-white/35">
+                  <span>
+                    {normalizedQuery
+                      ? `${filteredProducts.length + filteredStories.length} results`
+                      : 'Explore SAPPHIRE'}
+                  </span>
 
-                      <p className="mt-5 font-serif text-2xl text-black/70">
-                        Nothing found
-                      </p>
+                  <span>ESC to close</span>
+                </div>
+              </div>
 
-                      <p className="mx-auto mt-2 max-w-md font-sans text-xs leading-6 text-black/45">
-                        Try another product name, category, material,
-                        collection, or keyword.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="space-y-10">
-                      {/* Products */}
-                      {displayedProducts.length > 0 && (
-                        <section>
-                          <div className="mb-4 flex items-center justify-between border-b border-black/10 pb-3">
-                            <h4 className="font-sans text-[10px] uppercase tracking-[0.24em] text-black/55">
-                              Products
-                            </h4>
+              <main className="mx-auto mt-14 max-w-6xl pb-20">
+                {!normalizedQuery ? (
+                  <>
+                    <section>
+                      <div className="mb-6 flex items-end justify-between border-b border-white/10 pb-3">
+                        <div>
+                          <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
+                            Featured
+                          </p>
+                          <h2 className="mt-2 font-serif text-3xl">
+                            Selected Objects
+                          </h2>
+                        </div>
 
-                            <span className="font-sans text-[9px] uppercase tracking-[0.18em] text-black/35">
-                              {String(displayedProducts.length).padStart(2, '0')}
-                            </span>
-                          </div>
+                        <span className="text-xs text-white/35">
+                          {featuredProducts.length
+                            .toString()
+                            .padStart(2, '0')}
+                        </span>
+                      </div>
 
-                          <div className="divide-y divide-black/10">
-                            {displayedProducts.map((product) => (
-                              <button
-                                type="button"
-                                key={product.id}
-                                onClick={() => handleProductSelect(product)}
-                                className="group flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-black/[0.025] sm:gap-6"
-                              >
-                                <div className="h-20 w-16 shrink-0 overflow-hidden bg-[#e8e3da] sm:h-24 sm:w-20">
+                      {featuredProducts.length > 0 ? (
+                        <div className="grid grid-cols-1 gap-px bg-white/10 sm:grid-cols-2 lg:grid-cols-4">
+                          {featuredProducts.map((product) => (
+                            <button
+                              key={product.id}
+                              type="button"
+                              onClick={() => handleProductSelect(product)}
+                              className="group bg-[#11110f] text-left"
+                            >
+                              <div className="relative aspect-[4/5] overflow-hidden bg-[#e8e1d6]">
+                                <picture>
+                                  {product.images[0]?.webpUrl && (
+                                    <source
+                                      srcSet={product.images[0].webpUrl}
+                                      type="image/webp"
+                                    />
+                                  )}
+
                                   <img
                                     src={
-                                      product.images[0]?.webpUrl ||
-                                      product.images[0]?.url
+                                      product.images[0]?.url ||
+                                      '/editorial/edition.jpg'
                                     }
-                                    alt={
-                                      product.images[0]?.alt ||
-                                      product.name
-                                    }
-                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                                    alt={product.images[0]?.alt || product.name}
+                                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
                                   />
-                                </div>
+                                </picture>
 
-                                <div className="min-w-0 flex-1">
-                                  <p className="font-sans text-[9px] uppercase tracking-[0.2em] text-black/35">
+                                <div className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white/80 text-black opacity-0 backdrop-blur-sm transition group-hover:opacity-100">
+                                  <ArrowUpRight size={15} strokeWidth={1.5} />
+                                </div>
+                              </div>
+
+                              <div className="px-1 py-5">
+                                <p className="text-[9px] uppercase tracking-[0.25em] text-white/35">
+                                  {product.category}
+                                </p>
+
+                                <h3 className="mt-2 font-serif text-xl">
+                                  {product.name}
+                                </h3>
+
+                                <p className="mt-2 text-xs text-white/45">
+                                  {product.formattedPrice}
+                                </p>
+                              </div>
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="py-10 text-sm text-white/40">
+                          No products available.
+                        </p>
+                      )}
+                    </section>
+
+                    {stories.length > 0 && (
+                      <section className="mt-20">
+                        <div className="mb-6 border-b border-white/10 pb-3">
+                          <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
+                            Anthology
+                          </p>
+                          <h2 className="mt-2 font-serif text-3xl">
+                            Editorial Collections
+                          </h2>
+                        </div>
+
+                        <div className="grid gap-8 md:grid-cols-3">
+                          {stories.map((story) => (
+                            <button
+                              key={story.id}
+                              type="button"
+                              onClick={() => handleStorySelect(story)}
+                              className="group text-left"
+                            >
+                              <div className="aspect-[4/5] overflow-hidden bg-[#e8e1d6]">
+                                <picture>
+                                  {story.webpUrl && (
+                                    <source
+                                      srcSet={story.webpUrl}
+                                      type="image/webp"
+                                    />
+                                  )}
+
+                                  <img
+                                    src={story.image}
+                                    alt={story.title}
+                                    className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                                  />
+                                </picture>
+                              </div>
+
+                              <p className="mt-4 text-[9px] uppercase tracking-[0.25em] text-white/35">
+                                {story.label || story.edition || 'Collection'}
+                              </p>
+
+                              <h3 className="mt-2 font-serif text-2xl">
+                                {story.title}
+                              </h3>
+                            </button>
+                          ))}
+                        </div>
+                      </section>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {filteredProducts.length === 0 &&
+                    filteredStories.length === 0 ? (
+                      <div className="py-24 text-center">
+                        <p className="text-[10px] uppercase tracking-[0.3em] text-white/35">
+                          No results
+                        </p>
+
+                        <h2 className="mt-4 font-serif text-3xl">
+                          Nothing found for “{query}”
+                        </h2>
+
+                        <p className="mx-auto mt-4 max-w-md text-sm leading-6 text-white/40">
+                          Try another product name, material, category, or
+                          collection.
+                        </p>
+                      </div>
+                    ) : (
+                      <>
+                        {filteredProducts.length > 0 && (
+                          <section>
+                            <div className="mb-6 border-b border-white/10 pb-3">
+                              <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
+                                Products
+                              </p>
+                              <h2 className="mt-2 font-serif text-3xl">
+                                Objects
+                              </h2>
+                            </div>
+
+                            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                              {filteredProducts.map((product) => (
+                                <button
+                                  key={product.id}
+                                  type="button"
+                                  onClick={() => handleProductSelect(product)}
+                                  className="group text-left"
+                                >
+                                  <div className="aspect-[4/5] overflow-hidden bg-[#e8e1d6]">
+                                    <picture>
+                                      {product.images[0]?.webpUrl && (
+                                        <source
+                                          srcSet={product.images[0].webpUrl}
+                                          type="image/webp"
+                                        />
+                                      )}
+
+                                      <img
+                                        src={product.images[0]?.url}
+                                        alt={
+                                          product.images[0]?.alt || product.name
+                                        }
+                                        className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                                      />
+                                    </picture>
+                                  </div>
+
+                                  <p className="mt-4 text-[9px] uppercase tracking-[0.25em] text-white/35">
                                     {product.category}
                                   </p>
 
-                                  <h5 className="mt-1 truncate font-serif text-lg text-black sm:text-xl">
+                                  <h3 className="mt-2 font-serif text-2xl">
                                     {product.name}
-                                  </h5>
+                                  </h3>
 
-                                  <p className="mt-1 truncate font-sans text-[10px] tracking-wide text-black/45">
-                                    {product.tagline}
-                                  </p>
-                                </div>
-
-                                <div className="hidden shrink-0 text-right sm:block">
-                                  <p className="font-sans text-[10px] tracking-wide text-black/55">
+                                  <p className="mt-2 text-xs text-white/45">
                                     {product.formattedPrice}
                                   </p>
+                                </button>
+                              ))}
+                            </div>
+                          </section>
+                        )}
 
-                                  <ArrowUpRight
-                                    size={16}
-                                    strokeWidth={1.3}
-                                    className="ml-auto mt-3 text-black/30 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black"
-                                  />
-                                </div>
-                              </button>
-                            ))}
-                          </div>
-                        </section>
-                      )}
+                        {filteredStories.length > 0 && (
+                          <section className="mt-20">
+                            <div className="mb-6 border-b border-white/10 pb-3">
+                              <p className="text-[10px] uppercase tracking-[0.3em] text-white/40">
+                                Editorial
+                              </p>
+                              <h2 className="mt-2 font-serif text-3xl">
+                                Collections
+                              </h2>
+                            </div>
 
-                      {/* Editorial stories */}
-                      {storyMatches.length > 0 && (
-                        <section>
-                          <div className="mb-4 flex items-center justify-between border-b border-black/10 pb-3">
-                            <h4 className="font-sans text-[10px] uppercase tracking-[0.24em] text-black/55">
-                              Editorial
-                            </h4>
+                            <div className="grid gap-8 md:grid-cols-3">
+                              {filteredStories.map((story) => (
+                                <button
+                                  key={story.id}
+                                  type="button"
+                                  onClick={() => handleStorySelect(story)}
+                                  className="group text-left"
+                                >
+                                  <div className="aspect-[4/5] overflow-hidden bg-[#e8e1d6]">
+                                    <picture>
+                                      {story.webpUrl && (
+                                        <source
+                                          srcSet={story.webpUrl}
+                                          type="image/webp"
+                                        />
+                                      )}
 
-                            <span className="font-sans text-[9px] uppercase tracking-[0.18em] text-black/35">
-                              {String(storyMatches.length).padStart(2, '0')}
-                            </span>
-                          </div>
+                                      <img
+                                        src={story.image}
+                                        alt={story.title}
+                                        className="h-full w-full object-cover transition duration-700 group-hover:scale-[1.03]"
+                                      />
+                                    </picture>
+                                  </div>
 
-                          <div className="divide-y divide-black/10">
-                            {storyMatches.map((story) => (
-                              <button
-                                type="button"
-                                key={story.id}
-                                onClick={() => handleStorySelect(story.id)}
-                                className="group flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-black/[0.025] sm:gap-6"
-                              >
-                                <div className="h-20 w-16 shrink-0 overflow-hidden bg-[#e8e3da] sm:h-24 sm:w-20">
-                                  <img
-                                    src={story.webpUrl || story.image}
-                                    alt={story.title}
-                                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-                                  />
-                                </div>
-
-                                <div className="min-w-0 flex-1">
-                                  <p className="font-sans text-[9px] uppercase tracking-[0.2em] text-black/35">
-                                    {story.edition || story.category}
+                                  <p className="mt-4 text-[9px] uppercase tracking-[0.25em] text-white/35">
+                                    {story.label ||
+                                      story.edition ||
+                                      'Collection'}
                                   </p>
 
-                                  <h5 className="mt-1 font-serif text-lg leading-tight text-black sm:text-xl">
+                                  <h3 className="mt-2 font-serif text-2xl">
                                     {story.title}
-                                  </h5>
+                                  </h3>
+                                </button>
+                              ))}
+                            </div>
+                          </section>
+                        )}
+                      </>
+                    )}
+                  </>
+                )}
+              </main>
 
-                                  <p className="mt-1 line-clamp-1 font-sans text-[10px] tracking-wide text-black/45">
-                                    {story.description}
-                                  </p>
-                                </div>
-
-                                <ArrowUpRight
-                                  size={17}
-                                  strokeWidth={1.3}
-                                  className="mr-1 shrink-0 text-black/30 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-black"
-                                />
-                              </button>
-                            ))}
-                          </div>
-                        </section>
-                      )}
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between border-t border-black/10 px-5 py-4 sm:px-8">
-              <p className="font-sans text-[9px] uppercase tracking-[0.2em] text-black/35">
-                SAPPHIRE · Anthology 01
-              </p>
-
-              <p className="hidden font-sans text-[9px] uppercase tracking-[0.18em] text-black/30 sm:block">
-                ESC to close
-              </p>
+              <footer className="border-t border-white/10 py-8 text-center">
+                <p className="text-[9px] uppercase tracking-[0.35em] text-white/30">
+                  SAPPHIRE · MODERN PAKISTANI COUTURE
+                </p>
+              </footer>
             </div>
           </motion.div>
         </motion.div>
