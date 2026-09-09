@@ -6,21 +6,21 @@ export const CraftsmanshipSection: React.FC = () => {
   const craftPoints = [
     {
       num: '01',
-      title: 'Full-Grain European Calfskin',
+      title: 'Sculpted Leather',
       description:
-        'Sourced exclusively from certified ethical tanneries, each hide is drum-dyed through the grain, preserving organic tactile richness that forms a lustrous patina over years of carriage.',
+        'A considered leather construction shaped around the bag’s architectural silhouette, balancing structure with a soft, tactile finish.',
     },
     {
       num: '02',
-      title: 'Seven-Pass Edge Lacquering',
+      title: 'Refined Edges',
       description:
-        'Raw leather cuts undergo seven successive iterations of hand-sanding, beveling, pigment application, and heated beeswax sealing to ensure edges never fray or delaminate.',
+        'The profile is finished with clean, controlled edges that keep the silhouette precise and visually quiet from every angle.',
     },
     {
       num: '03',
-      title: 'Custom Forged Satin Brass',
+      title: 'Quiet Hardware',
       description:
-        'Every stud, clasp, and ring is cast from solid brass alloy with a hand-brushed satin champagne finish, resisting corrosion and fingerprint discoloration.',
+        'Minimal hardware completes the object without competing with its form, allowing proportion, texture, and material to remain the focus.',
     },
   ];
 
@@ -29,7 +29,11 @@ export const CraftsmanshipSection: React.FC = () => {
       id="section-craftsmanship"
       className="relative py-28 md:py-44 px-6 sm:px-10 md:px-14 bg-[#0B0A0A] border-t border-[#FAF8F5]/10 overflow-hidden text-[#FAF8F5] scroll-mt-20"
     >
-      <div id="section-craft" className="absolute top-0 left-0 scroll-mt-20 pointer-events-none" />
+      <div
+        id="section-craft"
+        className="absolute top-0 left-0 scroll-mt-20 pointer-events-none"
+      />
+
       <div className="max-w-7xl mx-auto">
         {/* Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between mb-20 md:mb-32 pb-6 border-b border-[#FAF8F5]/10 gap-8">
@@ -37,13 +41,18 @@ export const CraftsmanshipSection: React.FC = () => {
             <span className="text-[10px] tracking-[0.35em] uppercase font-sans text-[#D8CFBE]/60 block">
               Chapter 04 — The Craft
             </span>
+
             <h2 className="font-serif text-4xl sm:text-6xl md:text-7xl font-normal tracking-tight text-[#FAF8F5]">
-              Anatomy of <span className="italic font-light text-[#D8CFBE]">Restraint.</span>
+              Anatomy of{' '}
+              <span className="italic font-light text-[#D8CFBE]">
+                Restraint.
+              </span>
             </h2>
           </div>
+
           <p className="max-w-sm text-xs sm:text-sm font-sans font-light text-[#FAF8F5]/70 leading-relaxed">
-            Engineered by master leather artisans in Lahore, harmonizing ancestral artisanal leathercraft
-            with uncompromising modern geometry.
+            Every element is reduced to what is necessary — form, material,
+            proportion, and finish working together as one quiet object.
           </p>
         </div>
 
@@ -51,10 +60,13 @@ export const CraftsmanshipSection: React.FC = () => {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
           {/* Macro Detail Image */}
           <motion.div
-            initial={{ opacity: 0, scale: 0.98 }}
+            initial={{ opacity: 0, scale: 0.985 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: '-90px' }}
-            transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+            transition={{
+              duration: 1.2,
+              ease: [0.16, 1, 0.3, 1],
+            }}
             className="lg:col-span-6 relative group overflow-hidden bg-[#141312] border border-[#FAF8F5]/10"
           >
             <div className="aspect-[4/5] w-full overflow-hidden">
@@ -66,8 +78,12 @@ export const CraftsmanshipSection: React.FC = () => {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
                   />
                 ) : NOIR_STRUCTURE_BAG.images[3].webpUrl ? (
-                  <source type="image/webp" srcSet={NOIR_STRUCTURE_BAG.images[3].webpUrl} />
+                  <source
+                    type="image/webp"
+                    srcSet={NOIR_STRUCTURE_BAG.images[3].webpUrl}
+                  />
                 ) : null}
+
                 {NOIR_STRUCTURE_BAG.images[3].jpgSrcSet ? (
                   <source
                     type="image/jpeg"
@@ -75,19 +91,24 @@ export const CraftsmanshipSection: React.FC = () => {
                     sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 600px"
                   />
                 ) : null}
+
                 <img
-                  src={NOIR_STRUCTURE_BAG.images[3].webpUrl || NOIR_STRUCTURE_BAG.images[3].url}
-                  alt="NOIR STRUCTURE BAG — Macro leather craftsmanship detail"
+                  src={
+                    NOIR_STRUCTURE_BAG.images[3].webpUrl ||
+                    NOIR_STRUCTURE_BAG.images[3].url
+                  }
+                  alt="NOIR STRUCTURE BAG — close detail of the bag's material and finish"
                   width={896}
                   height={1200}
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-103 filter contrast-[1.03] brightness-[0.92]"
+                  className="w-full h-full object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-[1.03] filter contrast-[1.03] brightness-[0.92]"
                 />
               </picture>
             </div>
-            <div className="absolute bottom-6 left-6 bg-[#0B0A0A]/85 backdrop-blur-xs border border-[#FAF8F5]/10 text-[#FAF8F5] px-3.5 py-1.5 text-[8px] tracking-[0.3em] uppercase font-sans">
-              Macro Study · Calfskin Texture
+
+            <div className="absolute bottom-6 left-6 bg-[#0B0A0A]/85 backdrop-blur-sm border border-[#FAF8F5]/10 text-[#FAF8F5] px-3.5 py-1.5 text-[8px] tracking-[0.3em] uppercase font-sans">
+              Material Study · Detail
             </div>
           </motion.div>
 
@@ -99,27 +120,35 @@ export const CraftsmanshipSection: React.FC = () => {
                 initial={{ opacity: 0, y: 25 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.9, delay: index * 0.15, ease: [0.16, 1, 0.3, 1] }}
+                transition={{
+                  duration: 0.9,
+                  delay: index * 0.15,
+                  ease: [0.16, 1, 0.3, 1],
+                }}
                 className="border-b border-[#FAF8F5]/10 pb-8 space-y-2"
               >
                 <div className="flex items-baseline gap-4">
                   <span className="text-[10px] font-sans font-medium text-[#D8CFBE]/70 tracking-widest">
                     {point.num}
                   </span>
+
                   <h3 className="font-serif text-2xl sm:text-3xl text-[#FAF8F5] font-normal">
                     {point.title}
                   </h3>
                 </div>
+
                 <p className="text-xs sm:text-sm font-sans font-light text-[#FAF8F5]/70 leading-relaxed pl-8 max-w-md">
                   {point.description}
                 </p>
               </motion.div>
             ))}
 
-            <div className="pt-2 flex items-center gap-8 text-[9px] tracking-[0.25em] uppercase font-sans text-[#D8CFBE]/60">
-              <span>Serialized Archive Production</span>
+            <div className="pt-2 flex flex-wrap items-center gap-x-5 gap-y-2 text-[9px] tracking-[0.25em] uppercase font-sans text-[#D8CFBE]/60">
+              <span>Material</span>
               <span>·</span>
-              <span>Handmade in Lahore</span>
+              <span>Form</span>
+              <span>·</span>
+              <span>Finish</span>
             </div>
           </div>
         </div>
