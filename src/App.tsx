@@ -49,11 +49,24 @@ export default function App() {
     }
   });
 
-  const [isInWishlist, setIsInWishlist] = useState<boolean>(() => {
+  const [wishlist, setWishlist] = useState<Product[]>(() => {
     try {
-      return localStorage.getItem(WISHLIST_STORAGE_KEY) === 'true';
+      const saved = localStorage.getItem(WISHLIST_STORAGE_KEY);
+
+      if (!saved) return [];
+
+      const parsed = JSON.parse(saved);
+
+      if (!Array.isArray(parsed)) return [];
+
+      return parsed.filter(
+        (product): product is Product =>
+          product &&
+          typeof product.id === 'string' &&
+          typeof product.name === 'string'
+      );
     } catch {
-      return false;
+      return [];
     }
   });
 
@@ -65,9 +78,11 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
+  const [activeStoryId, setActiveStoryId] =
+    useState<string | null>(null);
 
-  const [toast, setToast] = useState<string | null>(null);
+  const [toast, setToast] =
+    useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -84,12 +99,12 @@ export default function App() {
     try {
       localStorage.setItem(
         WISHLIST_STORAGE_KEY,
-        String(isInWishlist)
+        JSON.stringify(wishlist)
       );
     } catch {
       // Ignore storage errors
     }
-  }, [isInWishlist]);
+  }, [wishlist]);
 
   useEffect(() => {
     if (!toast) return;
@@ -149,7 +164,9 @@ export default function App() {
     setToast(`${product.name} added to bag`);
   };
 
-  const handleAddToCart = (quantity: number = 1) => {
+  const handleAddToCart = (
+    quantity: number = 1
+  ) => {
     handleAddProductToCart(
       selectedProduct,
       quantity
@@ -192,19 +209,40 @@ export default function App() {
     );
   };
 
-  const handleToggleWishlist = () => {
-    setIsInWishlist((current) => {
-      const next = !current;
-
-      setToast(
-        next
-          ? `${selectedProduct.name} saved to wishlist`
-          : `${selectedProduct.name} removed from wishlist`
+  const handleToggleWishlist = (
+    product: Product
+  ) => {
+    setWishlist((currentWishlist) => {
+      const alreadySaved = currentWishlist.some(
+        (item) => item.id === product.id
       );
 
-      return next;
+      if (alreadySaved) {
+        setToast(
+          `${product.name} removed from wishlist`
+        );
+
+        return currentWishlist.filter(
+          (item) => item.id !== product.id
+        );
+      }
+
+      setToast(
+        `${product.name} saved to wishlist`
+      );
+
+      return [
+        ...currentWishlist,
+        product,
+      ];
     });
   };
+
+  const isSelectedProductInWishlist =
+    wishlist.some(
+      (product) =>
+        product.id === selectedProduct.id
+    );
 
   const handleNavigateSection = (
     sectionId: string
@@ -226,9 +264,10 @@ export default function App() {
     setActiveStoryId(storyId);
   };
 
-  const activeStory = EDITORIAL_COLLECTIONS.find(
-    (story) => story.id === activeStoryId
-  );
+  const activeStory =
+    EDITORIAL_COLLECTIONS.find(
+      (story) => story.id === activeStoryId
+    );
 
   const handleGoToProduct = () => {
     setActiveStoryId(null);
@@ -246,7 +285,9 @@ export default function App() {
   const handleOrderComplete = () => {
     setCart([]);
     setIsCheckoutOpen(false);
-    setToast('Order received successfully');
+    setToast(
+      'Order received successfully'
+    );
   };
 
   const cartCount = cart.reduce(
@@ -257,12 +298,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#f2eee7] text-[#171717]">
-
       <Navbar
         cartCount={cartCount}
-        wishlistCount={
-          isInWishlist ? 1 : 0
-        }
+        wishlistCount={wishlist.length}
         onOpenCart={() =>
           setIsCartOpen(true)
         }
@@ -278,7 +316,6 @@ export default function App() {
       />
 
       <main>
-
         <HeroSection
           onExploreClick={() =>
             handleNavigateSection(
@@ -320,11 +357,13 @@ export default function App() {
           onAddToCart={
             handleAddToCart
           }
-          onToggleWishlist={
-            handleToggleWishlist
+          onToggleWishlist={() =>
+            handleToggleWishlist(
+              selectedProduct
+            )
           }
           isInWishlist={
-            isInWishlist
+            isSelectedProductInWishlist
           }
         />
 
@@ -340,7 +379,6 @@ export default function App() {
             handleGoToProduct
           }
         />
-
       </main>
 
       <Footer
@@ -382,23 +420,16 @@ export default function App() {
 
       <WishlistDrawer
         isOpen={isWishlistOpen}
-        isInWishlist={
-          isInWishlist
-        }
-        product={selectedProduct}
+        wishlist={wishlist}
         onClose={() =>
           setIsWishlistOpen(false)
         }
         onToggleWishlist={
           handleToggleWishlist
         }
-        onAddToCart={() => {
-          handleAddProductToCart(
-            selectedProduct
-          );
-
-          setIsWishlistOpen(false);
-        }}
+        onAddToCart={
+          handleAddProductToCart
+        }
       />
 
       <CheckoutModal
@@ -443,7 +474,6 @@ export default function App() {
           {toast}
         </div>
       )}
-
     </div>
   );
-}
+              }
