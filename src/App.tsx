@@ -1,17 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Navbar } from './components/Navbar';
 import { HeroSection } from './components/HeroSection';
+import { NewEditionSection } from './components/NewEditionSection';
 import { CollectionEditorial } from './components/CollectionEditorial';
-import { CraftsmanshipSection } from './components/CraftsmanshipSection';
 import { ProductDetailSection } from './components/ProductDetailSection';
+import { CraftsmanshipSection } from './components/CraftsmanshipSection';
+import { ProductStorySection } from './components/ProductStorySection';
 import { DiscoverCTASection } from './components/DiscoverCTASection';
 import { Footer } from './components/Footer';
 import { CartDrawer } from './components/CartDrawer';
+import { CheckoutModal } from './components/CheckoutModal';
 import { SearchModal } from './components/SearchModal';
 import { WishlistDrawer } from './components/WishlistDrawer';
-import { CheckoutModal } from './components/CheckoutModal';
 import { StoryModal } from './components/StoryModal';
-import { NOIR_STRUCTURE_BAG } from './data/product';
+
+import {
+  NOIR_STRUCTURE_BAG,
+  EDITORIAL_COLLECTIONS,
+} from './data/product';
+
 import { CartItem, Product } from './types';
 
 const CART_STORAGE_KEY = 'sapphire_bag_cart';
@@ -35,11 +42,9 @@ export default function App() {
       return parsed.filter(
         (item): item is CartItem =>
           item &&
-          typeof item === 'object' &&
           item.product &&
           typeof item.product.id === 'string' &&
           typeof item.quantity === 'number' &&
-          Number.isFinite(item.quantity) &&
           item.quantity > 0
       );
     } catch {
@@ -63,89 +68,46 @@ export default function App() {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  const [activeStoryId, setActiveStoryId] =
-    useState<string | null>(null);
+  const [activeStoryId, setActiveStoryId] = useState<string | null>(null);
 
-  const [toastMessage, setToastMessage] =
-    useState<string | null>(null);
+  const [toast, setToast] = useState<string | null>(null);
 
-  const toastTimerRef =
-    useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  /*
-   * Persist cart
-   */
   useEffect(() => {
     try {
       localStorage.setItem(
         CART_STORAGE_KEY,
         JSON.stringify(cart)
       );
-    } catch (error) {
-      console.error('Unable to save cart:', error);
+    } catch {
+      // Ignore storage errors
     }
   }, [cart]);
 
-  /*
-   * Persist wishlist
-   */
   useEffect(() => {
     try {
       localStorage.setItem(
         WISHLIST_STORAGE_KEY,
         String(isInWishlist)
       );
-    } catch (error) {
-      console.error('Unable to save wishlist:', error);
+    } catch {
+      // Ignore storage errors
     }
   }, [isInWishlist]);
 
-  /*
-   * Cleanup toast timer
-   */
   useEffect(() => {
-    return () => {
-      if (toastTimerRef.current) {
-        clearTimeout(toastTimerRef.current);
-      }
-    };
-  }, []);
+    if (!toast) return;
 
-  /*
-   * Toast helper
-   */
-  const showToast = (message: string) => {
-    if (toastTimerRef.current) {
-      clearTimeout(toastTimerRef.current);
-    }
+    const timer = window.setTimeout(() => {
+      setToast(null);
+    }, 2500);
 
-    setToastMessage(message);
+    return () => window.clearTimeout(timer);
+  }, [toast]);
 
-    toastTimerRef.current = setTimeout(() => {
-      setToastMessage(null);
-      toastTimerRef.current = null;
-    }, 3000);
-  };
-
-  /*
-   * Find product by ID
-   *
-   * This will become the central product lookup
-   * once the full catalog is added.
-   */
-  const getProductById = (productId: string) => {
-    return PRODUCTS.find(
-      (product) => product.id === productId
-    );
-  };
-
-  /*
-   * Select product
-   */
   const handleSelectProduct = (product: Product) => {
     setSelectedProduct(product);
 
-    requestAnimationFrame(() => {
+    window.requestAnimationFrame(() => {
       const element = document.getElementById(
         'section-product-detail'
       );
@@ -157,55 +119,39 @@ export default function App() {
     });
   };
 
-  /*
-   * Add product to cart
-   */
   const handleAddProductToCart = (
     product: Product,
     quantity: number = 1
   ) => {
-    const safeQuantity = Math.max(
-      1,
-      Math.floor(quantity)
-    );
-
-    setCart((prev) => {
-      const existing = prev.find(
+    setCart((currentCart) => {
+      const existingItem = currentCart.find(
         (item) => item.product.id === product.id
       );
 
-      if (existing) {
-        return prev.map((item) =>
+      if (existingItem) {
+        return currentCart.map((item) =>
           item.product.id === product.id
             ? {
                 ...item,
-                quantity:
-                  item.quantity + safeQuantity,
+                quantity: item.quantity + quantity,
               }
             : item
         );
       }
 
       return [
-        ...prev,
+        ...currentCart,
         {
           product,
-          quantity: safeQuantity,
+          quantity,
           selectedColor: product.color,
         },
       ];
     });
 
-    showToast(
-      `${safeQuantity} × ${product.name} added to your bag`
-    );
+    setToast(`${product.name} added to bag`);
   };
 
-  /*
-   * Current product add-to-cart handler
-   *
-   * Kept compatible with ProductDetailSection.
-   */
   const handleAddToCart = (quantity: number = 1) => {
     handleAddProductToCart(
       selectedProduct,
@@ -213,135 +159,113 @@ export default function App() {
     );
   };
 
-  /*
-   * Update cart quantity
-   */
   const handleUpdateQuantity = (
     productId: string,
     quantity: number
   ) => {
-    const safeQuantity = Math.floor(quantity);
+    if (quantity <= 0) {
+      setCart((currentCart) =>
+        currentCart.filter(
+          (item) => item.product.id !== productId
+        )
+      );
 
-    if (safeQuantity <= 0) {
-      handleRemoveFromCart(productId);
       return;
     }
 
-    setCart((prev) =>
-      prev.map((item) =>
+    setCart((currentCart) =>
+      currentCart.map((item) =>
         item.product.id === productId
           ? {
               ...item,
-              quantity: safeQuantity,
+              quantity,
             }
           : item
       )
     );
   };
 
-  /*
-   * Remove cart item
-   */
   const handleRemoveFromCart = (
     productId: string
   ) => {
-    setCart((prev) =>
-      prev.filter(
+    setCart((currentCart) =>
+      currentCart.filter(
         (item) => item.product.id !== productId
       )
     );
-
-    showToast('Item removed from bag');
   };
 
-  /*
-   * Wishlist
-   *
-   * Existing UI currently supports the hero product.
-   * The state is kept compatible while the catalog
-   * architecture is expanded.
-   */
   const handleToggleWishlist = () => {
-    setIsInWishlist((prev) => {
-      const next = !prev;
+    setIsInWishlist((current) => {
+      const next = !current;
 
-      showToast(
+      setToast(
         next
-          ? 'Saved to wishlist'
-          : 'Removed from wishlist'
+          ? `${selectedProduct.name} saved to wishlist`
+          : `${selectedProduct.name} removed from wishlist`
       );
 
       return next;
     });
   };
 
-  /*
-   * Scroll helper
-   */
-  const scrollToSection = (sectionId: string) => {
+  const handleNavigateSection = (
+    sectionId: string
+  ) => {
     const element =
       document.getElementById(sectionId);
 
-    if (!element) return;
-
-    element.scrollIntoView({
-      behavior: 'smooth',
-      block: 'start',
-    });
+    if (element) {
+      element.scrollIntoView({
+        behavior: 'smooth',
+        block: 'start',
+      });
+    }
   };
 
-  /*
-   * Cart totals
-   */
-  const cartTotalItems = cart.reduce(
-    (sum, item) => sum + item.quantity,
-    0
+  const handleSelectStory = (
+    storyId: string
+  ) => {
+    setActiveStoryId(storyId);
+  };
+
+  const activeStory = EDITORIAL_COLLECTIONS.find(
+    (story) => story.id === activeStoryId
   );
 
-  /*
-   * Checkout
-   */
-  const handleOpenCheckout = () => {
-    if (cart.length === 0) {
-      showToast('Your bag is empty');
-      return;
-    }
-
-    setIsCartOpen(false);
-    setIsCheckoutOpen(true);
-  };
-
-  /*
-   * Search product selection
-   *
-   * SearchModal currently selects the existing
-   * product flow. This handler also keeps the
-   * selected product architecture ready for
-   * the expanded search system.
-   */
-  const handleSearchProduct = () => {
-    setIsSearchOpen(false);
-
-    handleSelectProduct(
-      selectedProduct || NOIR_STRUCTURE_BAG
-    );
-  };
-
-  /*
-   * Story navigation
-   */
   const handleGoToProduct = () => {
     setActiveStoryId(null);
+
     handleSelectProduct(
       NOIR_STRUCTURE_BAG
     );
   };
 
+  const handleGoToCheckout = () => {
+    setIsCartOpen(false);
+    setIsCheckoutOpen(true);
+  };
+
+  const handleOrderComplete = () => {
+    setCart([]);
+    setIsCheckoutOpen(false);
+    setToast('Order received successfully');
+  };
+
+  const cartCount = cart.reduce(
+    (total, item) =>
+      total + item.quantity,
+    0
+  );
+
   return (
-    <div className="relative min-h-screen bg-[#0B0A0A] text-[#FAF8F5] flex flex-col font-sans selection:bg-[#FAF8F5] selection:text-[#0B0A0A]">
+    <div className="min-h-screen bg-[#f2eee7] text-[#171717]">
+
       <Navbar
-        cartCount={cartTotalItems}
-        wishlistCount={isInWishlist ? 1 : 0}
+        cartCount={cartCount}
+        wishlistCount={
+          isInWishlist ? 1 : 0
+        }
         onOpenCart={() =>
           setIsCartOpen(true)
         }
@@ -352,42 +276,58 @@ export default function App() {
           setIsWishlistOpen(true)
         }
         onNavigateSection={
-          scrollToSection
+          handleNavigateSection
         }
       />
 
-      <main className="flex-1 w-full">
+      <main>
+
         <HeroSection
           onExploreClick={() =>
-            scrollToSection(
+            handleNavigateSection(
+              'section-new-edition'
+            )
+          }
+          onHeroProductClick={
+            handleGoToProduct
+          }
+        />
+
+        <NewEditionSection
+          onExplore={() =>
+            handleNavigateSection(
               'section-collections'
             )
           }
-          onHeroProductClick={() => {
-            setSelectedProduct(
-              NOIR_STRUCTURE_BAG
-            );
-
-            scrollToSection(
-              'section-product-detail'
-            );
-          }}
         />
 
         <CollectionEditorial
-          onSelectStory={(storyId) =>
-            setActiveStoryId(storyId)
+          onSelectStory={
+            handleSelectStory
+          }
+        />
+
+        <ProductStorySection
+          onGoToProduct={
+            handleGoToProduct
+          }
+          onQuickAdd={() =>
+            handleAddProductToCart(
+              NOIR_STRUCTURE_BAG
+            )
           }
         />
 
         <ProductDetailSection
           product={selectedProduct}
-          isInWishlist={isInWishlist}
+          onAddToCart={
+            handleAddToCart
+          }
           onToggleWishlist={
             handleToggleWishlist
           }
-          onAddToCart={
-            handleAddToCart
+          isInWishlist={
+            isInWishlist
           }
         />
 
@@ -395,25 +335,20 @@ export default function App() {
 
         <DiscoverCTASection
           onExploreCollection={() =>
-            scrollToSection(
+            handleNavigateSection(
               'section-collections'
             )
           }
-          onAcquireBag={() => {
-            setSelectedProduct(
-              NOIR_STRUCTURE_BAG
-            );
-
-            scrollToSection(
-              'section-product-detail'
-            );
-          }}
+          onAcquireBag={
+            handleGoToProduct
+          }
         />
+
       </main>
 
       <Footer
         onNavigateSection={
-          scrollToSection
+          handleNavigateSection
         }
       />
 
@@ -430,7 +365,7 @@ export default function App() {
           handleRemoveFromCart
         }
         onGoToCheckout={
-          handleOpenCheckout
+          handleGoToCheckout
         }
       />
 
@@ -440,8 +375,12 @@ export default function App() {
           setIsSearchOpen(false)
         }
         onSelectProduct={
-          handleSearchProduct
+          handleSelectProduct
         }
+        onSelectStory={
+          handleSelectStory
+        }
+        products={PRODUCTS}
       />
 
       <WishlistDrawer
@@ -449,9 +388,7 @@ export default function App() {
         isInWishlist={
           isInWishlist
         }
-        product={
-          selectedProduct
-        }
+        product={selectedProduct}
         onClose={() =>
           setIsWishlistOpen(false)
         }
@@ -460,12 +397,10 @@ export default function App() {
         }
         onAddToCart={() => {
           handleAddProductToCart(
-            selectedProduct,
-            1
+            selectedProduct
           );
 
           setIsWishlistOpen(false);
-          setIsCartOpen(true);
         }}
       />
 
@@ -475,14 +410,13 @@ export default function App() {
         onClose={() =>
           setIsCheckoutOpen(false)
         }
-        onOrderComplete={() => {
-          setCart([]);
-          setIsCheckoutOpen(false);
-        }}
+        onOrderComplete={
+          handleOrderComplete
+        }
       />
 
       <StoryModal
-        storyId={activeStoryId}
+        story={activeStory}
         onClose={() =>
           setActiveStoryId(null)
         }
@@ -491,22 +425,28 @@ export default function App() {
         }
       />
 
-      {toastMessage && (
+      {toast && (
         <div
-          role="status"
-          aria-live="polite"
-          className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 max-w-[calc(100vw-2rem)] px-5 py-2.5 bg-[#141312] text-[#FAF8F5] text-[10px] font-sans tracking-[0.2em] uppercase shadow-2xl border border-[#FAF8F5]/20 flex items-center gap-2.5"
+          className="
+            fixed
+            bottom-6
+            left-1/2
+            z-[100]
+            -translate-x-1/2
+            rounded-full
+            bg-[#171717]
+            px-5
+            py-3
+            text-xs
+            tracking-[0.12em]
+            text-[#f2eee7]
+            shadow-2xl
+          "
         >
-          <span
-            aria-hidden="true"
-            className="w-1.5 h-1.5 rounded-full bg-[#D8CFBE] shrink-0"
-          />
-
-          <span>
-            {toastMessage}
-          </span>
+          {toast}
         </div>
       )}
+
     </div>
   );
-    }
+            }
