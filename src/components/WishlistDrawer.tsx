@@ -5,17 +5,15 @@ import { Product } from '../types';
 
 interface WishlistDrawerProps {
   isOpen: boolean;
-  isInWishlist: boolean;
-  product: Product;
+  wishlist: Product[];
   onClose: () => void;
-  onToggleWishlist: () => void;
-  onAddToCart: () => void;
+  onToggleWishlist: (product: Product) => void;
+  onAddToCart: (product: Product) => void;
 }
 
 export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
   isOpen,
-  isInWishlist,
-  product,
+  wishlist,
   onClose,
   onToggleWishlist,
   onAddToCart,
@@ -40,9 +38,9 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
     };
   }, [isOpen, onClose]);
 
-  const handleMoveToBag = () => {
-    onAddToCart();
-    onClose();
+  const handleMoveToBag = (product: Product) => {
+    onAddToCart(product);
+    onToggleWishlist(product);
   };
 
   return (
@@ -75,21 +73,22 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
               duration: 0.45,
               ease: [0.16, 1, 0.3, 1],
             }}
-            className="absolute inset-y-0 right-0 w-full max-w-md bg-[#0B0A0A] text-[#FAF8F5] border-l border-[#FAF8F5]/10 shadow-2xl flex flex-col"
+            className="absolute inset-y-0 right-0 flex w-full max-w-md flex-col border-l border-[#FAF8F5]/10 bg-[#0B0A0A] text-[#FAF8F5] shadow-2xl"
             onClick={(event) => event.stopPropagation()}
           >
             {/* Header */}
-            <header className="p-6 sm:p-8 border-b border-[#FAF8F5]/10 flex items-center justify-between shrink-0">
+            <header className="flex shrink-0 items-center justify-between border-b border-[#FAF8F5]/10 p-6 sm:p-8">
               <div className="flex items-center gap-3">
-                <Heart className="w-4 h-4 text-[#D8CFBE]" />
+                <Heart className="h-4 w-4 text-[#D8CFBE]" />
 
                 <h2
                   id="wishlist-title"
-                  className="font-serif text-xl tracking-[0.08em] text-[#FAF8F5] uppercase font-light"
+                  className="font-serif text-xl font-light uppercase tracking-[0.08em] text-[#FAF8F5]"
                 >
                   Wishlist
-                  <span className="text-[#FAF8F5]/40 ml-2 text-sm tracking-normal">
-                    {isInWishlist ? '01' : '00'}
+
+                  <span className="ml-2 text-sm tracking-normal text-[#FAF8F5]/40">
+                    {wishlist.length.toString().padStart(2, '0')}
                   </span>
                 </h2>
               </div>
@@ -99,108 +98,124 @@ export const WishlistDrawer: React.FC<WishlistDrawerProps> = ({
                 type="button"
                 onClick={onClose}
                 aria-label="Close wishlist"
-                className="min-w-10 min-h-10 flex items-center justify-center text-[#FAF8F5]/60 hover:text-[#FAF8F5] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FAF8F5]/70"
+                className="flex min-h-10 min-w-10 items-center justify-center text-[#FAF8F5]/60 transition-colors hover:text-[#FAF8F5] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FAF8F5]/70"
               >
-                <X className="w-4 h-4" />
+                <X className="h-4 w-4" />
               </button>
             </header>
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-6 sm:p-8">
-              {!isInWishlist ? (
-                <div className="min-h-full flex flex-col items-center justify-center text-center py-20">
-                  <div className="w-12 h-12 rounded-full bg-[#141312] border border-[#FAF8F5]/10 flex items-center justify-center text-[#D8CFBE]">
-                    <Heart className="w-5 h-5" />
+              {wishlist.length === 0 ? (
+                <div className="flex min-h-full flex-col items-center justify-center py-20 text-center">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full border border-[#FAF8F5]/10 bg-[#141312] text-[#D8CFBE]">
+                    <Heart className="h-5 w-5" />
                   </div>
 
-                  <h3 className="mt-5 font-serif text-2xl text-[#FAF8F5] font-normal">
+                  <h3 className="mt-5 font-serif text-2xl font-normal text-[#FAF8F5]">
                     Nothing saved
                   </h3>
 
-                  <p className="mt-3 text-xs font-sans font-light text-[#FAF8F5]/50 max-w-xs leading-relaxed">
+                  <p className="mt-3 max-w-xs text-xs font-sans font-light leading-relaxed text-[#FAF8F5]/50">
                     Save pieces you want to revisit while exploring the editorial study.
                   </p>
                 </div>
               ) : (
-                <article className="border-b border-[#FAF8F5]/10 pb-7">
-                  <div className="flex gap-4">
-                    {/* Product Image */}
-                    <div className="w-20 h-24 bg-[#141312] border border-[#FAF8F5]/10 overflow-hidden shrink-0">
-                      <picture className="w-full h-full block">
-                        {product.images[0].thumbnailWebpUrl && (
-                          <source
-                            type="image/webp"
-                            srcSet={product.images[0].thumbnailWebpUrl}
-                          />
-                        )}
+                <div className="space-y-7">
+                  {wishlist.map((product) => {
+                    const image = product.images?.[0];
 
-                        <img
-                          src={
-                            product.images[0].thumbnailUrl ||
-                            product.images[0].url
-                          }
-                          alt={product.name}
-                          width={80}
-                          height={96}
-                          loading="lazy"
-                          decoding="async"
-                          className="w-full h-full object-cover object-center"
-                        />
-                      </picture>
-                    </div>
+                    return (
+                      <article
+                        key={product.id}
+                        className="border-b border-[#FAF8F5]/10 pb-7"
+                      >
+                        <div className="flex gap-4">
+                          {/* Product Image */}
+                          <div className="h-24 w-20 shrink-0 overflow-hidden border border-[#FAF8F5]/10 bg-[#141312]">
+                            {image && (
+                              <picture className="block h-full w-full">
+                                {image.thumbnailWebpUrl && (
+                                  <source
+                                    type="image/webp"
+                                    srcSet={image.thumbnailWebpUrl}
+                                  />
+                                )}
 
-                    {/* Product Details */}
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="min-w-0">
-                          <span className="text-[8px] tracking-[0.25em] uppercase font-sans text-[#D8CFBE]/65 block mb-1.5">
-                            Saved Object
-                          </span>
+                                <img
+                                  src={
+                                    image.thumbnailUrl ||
+                                    image.webpUrl ||
+                                    image.url
+                                  }
+                                  alt={image.alt || product.name}
+                                  width={80}
+                                  height={96}
+                                  loading="lazy"
+                                  decoding="async"
+                                  className="h-full w-full object-cover object-center"
+                                />
+                              </picture>
+                            )}
+                          </div>
 
-                          <h4 className="font-serif text-base text-[#FAF8F5] leading-tight">
-                            {product.name}
-                          </h4>
+                          {/* Product Details */}
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-3">
+                              <div className="min-w-0">
+                                <span className="mb-1.5 block text-[8px] font-sans uppercase tracking-[0.25em] text-[#D8CFBE]/65">
+                                  {product.badge || product.category || 'Saved Object'}
+                                </span>
 
-                          <p className="mt-1 text-[10px] tracking-[0.16em] uppercase font-sans text-[#D8CFBE]/75">
-                            {product.formattedPrice}
-                          </p>
+                                <h4 className="font-serif text-base leading-tight text-[#FAF8F5]">
+                                  {product.name}
+                                </h4>
+
+                                <p className="mt-1 text-[10px] font-sans uppercase tracking-[0.16em] text-[#D8CFBE]/75">
+                                  {product.formattedPrice}
+                                </p>
+
+                                <p className="mt-1 text-[9px] font-sans uppercase tracking-[0.14em] text-[#FAF8F5]/35">
+                                  {product.color}
+                                </p>
+                              </div>
+
+                              <button
+                                type="button"
+                                onClick={() => onToggleWishlist(product)}
+                                aria-label={`Remove ${product.name} from wishlist`}
+                                className="flex min-h-10 min-w-10 shrink-0 items-center justify-center text-[#FAF8F5]/35 transition-colors hover:text-[#FAF8F5] focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FAF8F5]/70"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                              </button>
+                            </div>
+                          </div>
                         </div>
 
+                        {/* Move to Bag */}
                         <button
-                          id="remove-from-wishlist-button"
                           type="button"
-                          onClick={onToggleWishlist}
-                          aria-label={`Remove ${product.name} from wishlist`}
-                          className="min-w-10 min-h-10 flex items-center justify-center shrink-0 text-[#FAF8F5]/35 hover:text-[#FAF8F5] transition-colors focus:outline-none focus-visible:ring-1 focus-visible:ring-[#FAF8F5]/70"
+                          onClick={() => handleMoveToBag(product)}
+                          className="mt-6 flex min-h-11 w-full items-center justify-center gap-2.5 bg-[#FAF8F5] px-4 py-3 text-[10px] font-sans font-medium uppercase tracking-[0.22em] text-[#0B0A0A] transition-colors hover:bg-[#D8CFBE] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D8CFBE]/70"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <span>Move to Bag</span>
+                          <ArrowRight className="h-3 w-3" />
                         </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Move to Bag */}
-                  <button
-                    id="move-to-bag-from-wishlist-button"
-                    type="button"
-                    onClick={handleMoveToBag}
-                    className="mt-6 w-full min-h-11 py-3 px-4 bg-[#FAF8F5] text-[#0B0A0A] text-[10px] tracking-[0.22em] uppercase font-sans font-medium flex items-center justify-center gap-2.5 hover:bg-[#D8CFBE] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D8CFBE]/70"
-                  >
-                    <span>Move to Bag</span>
-                    <ArrowRight className="w-3 h-3" />
-                  </button>
-                </article>
+                      </article>
+                    );
+                  })}
+                </div>
               )}
             </div>
 
             {/* Footer */}
-            <footer className="p-6 border-t border-[#FAF8F5]/10 bg-[#100F0F] shrink-0">
+            <footer className="shrink-0 border-t border-[#FAF8F5]/10 bg-[#100F0F] p-6">
               <div className="flex items-center justify-between gap-4">
-                <span className="text-[9px] tracking-[0.25em] uppercase font-sans text-[#D8CFBE]/55">
+                <span className="text-[9px] font-sans uppercase tracking-[0.25em] text-[#D8CFBE]/55">
                   Editorial Selection
                 </span>
 
-                <span className="text-[9px] tracking-[0.18em] uppercase font-sans text-[#FAF8F5]/30">
+                <span className="text-[9px] font-sans uppercase tracking-[0.18em] text-[#FAF8F5]/30">
                   SAPPHIRE CONCEPT
                 </span>
               </div>
