@@ -23,15 +23,26 @@ export interface Product {
   color: string;
   colorHex: string;
   description: string;
+
+  category: string;
+  collection?: string;
+  type?: string;
+  featured?: boolean;
+  badge?: string;
+
   images: ProductImage[];
   details: string[];
   materials: string[];
-  dimensions: {
-    height: string;
-    width: string;
-    depth: string;
-    strapDrop: string;
+
+  dimensions?: {
+    height?: string;
+    width?: string;
+    depth?: string;
+    strapDrop?: string;
+    length?: string;
+    fit?: string;
   };
+
   shippingInfo: string;
   returnsInfo: string;
 }
