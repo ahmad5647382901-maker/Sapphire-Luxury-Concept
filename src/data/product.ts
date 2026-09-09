@@ -1,7 +1,7 @@
 import { Product, EditorialStory } from '../types';
 
 /* =========================================================
-   PRODUCT CATALOG
+   PRIMARY PRODUCT
 ========================================================= */
 
 export const NOIR_STRUCTURE_BAG: Product = {
@@ -13,6 +13,7 @@ export const NOIR_STRUCTURE_BAG: Product = {
   formattedPrice: 'PKR 8,990',
   color: 'Noir Black',
   colorHex: '#111111',
+
   description:
     'A structured leather silhouette designed around quiet geometry, refined proportions, and everyday restraint.',
 
@@ -80,11 +81,9 @@ export const NOIR_STRUCTURE_BAG: Product = {
 
   dimensions: {
     height: '22 cm / 8.6 in',
-    width:
-      '28 cm / 11.0 in (base) · 24 cm / 9.4 in (top)',
+    width: '28 cm / 11.0 in (base) · 24 cm / 9.4 in (top)',
     depth: '11.5 cm / 4.5 in',
-    strapDrop:
-      '48 cm – 56 cm / 18.9 – 22.0 in (adjustable)',
+    strapDrop: '48 cm – 56 cm / 18.9 – 22.0 in (adjustable)',
   },
 
   shippingInfo:
@@ -95,185 +94,12 @@ export const NOIR_STRUCTURE_BAG: Product = {
 };
 
 /* =========================================================
-   ADDITIONAL CATALOG OBJECTS
-========================================================= */
-
-export const SILK_FORM_SCARF: Product = {
-  id: 'silk-form-scarf',
-  name: 'SILK FORM SCARF',
-  tagline: 'Soft geometry in motion.',
-  price: 4290,
-  currency: 'PKR',
-  formattedPrice: 'PKR 4,290',
-  color: 'Raw Ivory',
-  colorHex: '#e8e1d5',
-  description:
-    'A fluid silk study balancing soft movement with the precise visual language of the SAPPHIRE anthology.',
-
-  category: 'Accessories',
-  collection: 'The Raw Silk Studio',
-  type: 'Silk Scarf',
-  featured: true,
-  badge: 'Edition II',
-
-  images: [
-    {
-      id: 'silk-form-main',
-      label: 'Main',
-      viewName: 'Editorial View',
-      url: '/editorial/silk.jpg',
-      webpUrl: '/editorial/silk.webp',
-      alt: 'SAPPHIRE Silk Form Scarf',
-      thumbnailUrl: '/editorial/silk.jpg',
-      thumbnailWebpUrl: '/editorial/silk.webp',
-    },
-  ],
-
-  details: [
-    'Fluid lightweight silhouette',
-    'Minimal tonal finish',
-    'Designed for layered styling',
-  ],
-
-  materials: [
-    'Fine silk textile',
-    'Soft hand-finished edges',
-  ],
-
-  dimensions: {
-    height: '70 cm',
-    width: '70 cm',
-    length: '70 cm',
-  },
-
-  shippingInfo:
-    'Nationwide delivery across Pakistan. Carefully packed for dispatch.',
-
-  returnsInfo:
-    'Returns accepted according to the SAPPHIRE concept return policy.',
-};
-
-export const ARCHITECT_TOTE: Product = {
-  id: 'architect-tote',
-  name: 'ARCHITECT TOTE',
-  tagline: 'Volume, proportion, restraint.',
-  price: 7490,
-  currency: 'PKR',
-  formattedPrice: 'PKR 7,490',
-  color: 'Stone',
-  colorHex: '#aaa296',
-  description:
-    'A spacious architectural tote inspired by the clean proportions of the SAPPHIRE tailoring studies.',
-
-  category: 'Bags',
-  collection: 'The Architectural Silhouette',
-  type: 'Structured Tote',
-  featured: true,
-  badge: 'Edition I',
-
-  images: [
-    {
-      id: 'architect-main',
-      label: 'Main',
-      viewName: 'Editorial View',
-      url: '/editorial/edition.jpg',
-      webpUrl: '/editorial/edition.webp',
-      alt: 'SAPPHIRE Architect Tote',
-      thumbnailUrl: '/editorial/edition.jpg',
-      thumbnailWebpUrl: '/editorial/edition.webp',
-    },
-  ],
-
-  details: [
-    'Generous everyday capacity',
-    'Structured rectangular profile',
-    'Minimal exterior detailing',
-  ],
-
-  materials: [
-    'Structured textile body',
-    'Reinforced handles',
-    'Metal hardware',
-  ],
-
-  dimensions: {
-    height: '31 cm',
-    width: '38 cm',
-    depth: '13 cm',
-  },
-
-  shippingInfo:
-    'Nationwide delivery across Pakistan. Carefully packed for dispatch.',
-
-  returnsInfo:
-    'Returns accepted according to the SAPPHIRE concept return policy.',
-};
-
-export const ATELIER_METAL_CUFF: Product = {
-  id: 'atelier-metal-cuff',
-  name: 'ATELIER METAL CUFF',
-  tagline: 'Quiet hardware. Sculptural presence.',
-  price: 3290,
-  currency: 'PKR',
-  formattedPrice: 'PKR 3,290',
-  color: 'Brushed Silver',
-  colorHex: '#aaa9a5',
-  description:
-    'A restrained metal form inspired by the hardware language of the SAPPHIRE atelier.',
-
-  category: 'Jewellery',
-  collection: 'Atelier Craftsmanship',
-  type: 'Metal Cuff',
-  featured: false,
-  badge: 'Atelier Object',
-
-  images: [
-    {
-      id: 'cuff-main',
-      label: 'Main',
-      viewName: 'Editorial View',
-      url: '/editorial/craft.jpg',
-      webpUrl: '/editorial/craft.webp',
-      alt: 'SAPPHIRE Atelier Metal Cuff',
-      thumbnailUrl: '/editorial/craft.jpg',
-      thumbnailWebpUrl: '/editorial/craft.webp',
-    },
-  ],
-
-  details: [
-    'Minimal sculptural profile',
-    'Polished architectural finish',
-    'Designed as a standalone object',
-  ],
-
-  materials: [
-    'Metal alloy',
-    'Brushed surface finish',
-  ],
-
-  dimensions: {
-    height: '5.5 cm',
-    width: '6.5 cm',
-    depth: '0.5 cm',
-    fit: 'Adjustable open cuff',
-  },
-
-  shippingInfo:
-    'Nationwide delivery across Pakistan. Carefully packed for dispatch.',
-
-  returnsInfo:
-    'Returns accepted according to the SAPPHIRE concept return policy.',
-};
-
-/* =========================================================
-   COMPLETE PRODUCT LIST
+   PRODUCT LIST
+   Only the original Black SAPPHIRE product is active.
 ========================================================= */
 
 export const PRODUCTS: Product[] = [
   NOIR_STRUCTURE_BAG,
-  SILK_FORM_SCARF,
-  ARCHITECT_TOTE,
-  ATELIER_METAL_CUFF,
 ];
 
 /* =========================================================
