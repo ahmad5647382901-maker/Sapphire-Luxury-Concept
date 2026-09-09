@@ -16,6 +16,7 @@ import { StoryModal } from './components/StoryModal';
 
 import {
   NOIR_STRUCTURE_BAG,
+  PRODUCTS,
   EDITORIAL_COLLECTIONS,
 } from './data/product';
 
@@ -23,10 +24,6 @@ import { CartItem, Product } from './types';
 
 const CART_STORAGE_KEY = 'sapphire_bag_cart';
 const WISHLIST_STORAGE_KEY = 'sapphire_bag_wishlist';
-
-const PRODUCTS: Product[] = [
-  NOIR_STRUCTURE_BAG,
-];
 
 export default function App() {
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -449,4 +446,4 @@ export default function App() {
 
     </div>
   );
-            }
+}
