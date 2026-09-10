@@ -1169,4 +1169,3 @@ export function ProductDetailSection({
       </div>
     </section>
   );
-      }
